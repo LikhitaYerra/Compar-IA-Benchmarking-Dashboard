@@ -56,6 +56,7 @@ def load_real_data():
 
 def process_metrics_csv(df):
     """Process the metrics CSV file to create proper data structure"""
+    # The CSV already has aggregated metrics, we need to create individual task data
     data = []
     
     for _, row in df.iterrows():
