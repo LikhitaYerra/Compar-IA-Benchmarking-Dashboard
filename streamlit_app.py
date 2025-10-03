@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # Mistral API configuration
-MISTRAL_API_KEY = "dkPiVzt6e0r3EALuFjUbZB42UziNjewp"
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @st.cache_resource
 def get_mistral_client():
