@@ -4,7 +4,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 import os
-import json
 from mistralai import Mistral
 
 # Page configuration
@@ -15,24 +14,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Mistral API configuration
+# Mistral AI setup
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 
 @st.cache_resource
 def get_mistral_client():
-    """Initialize and cache Mistral client"""
-    try:
+    """Get Mistral client with caching"""
+    if MISTRAL_API_KEY:
         return Mistral(api_key=MISTRAL_API_KEY)
-    except Exception as e:
-        st.error(f"Error initializing Mistral client: {e}")
-        return None
+    return None
 
 def call_mistral_api(prompt, model="mistral-small-latest"):
     """Call Mistral API with error handling"""
     try:
         client = get_mistral_client()
         if not client:
-            return "Error: Mistral client not available"
+            return "Mistral API key not found. Please set MISTRAL_API_KEY environment variable."
         
         response = client.chat.complete(
             model=model,
@@ -42,155 +39,147 @@ def call_mistral_api(prompt, model="mistral-small-latest"):
     except Exception as e:
         return f"Error calling Mistral API: {e}"
 
-def load_real_data():
-    """Load real data from CSV file"""
+def generate_ai_insights(metrics_df, raw_df):
+    """Generate AI insights from the data"""
     try:
-        if os.path.exists('comparai_metrics_detailed.csv'):
-            df = pd.read_csv('comparai_metrics_detailed.csv')
-            return process_metrics_csv(df)
-        else:
-            return create_sample_data()
+        # Prepare data summary for AI
+        data_summary = f"""
+        Model Performance Data:
+        - Total Models: {len(metrics_df)}
+        - Models: {', '.join(metrics_df['Model'].tolist())}
+        
+        Quality Scores (1-5):
+        - Best: {metrics_df['Quality_Score_mean'].max():.2f} ({metrics_df.loc[metrics_df['Quality_Score_mean'].idxmax(), 'Model']})
+        - Worst: {metrics_df['Quality_Score_mean'].min():.2f} ({metrics_df.loc[metrics_df['Quality_Score_mean'].idxmin(), 'Model']})
+        - Average: {metrics_df['Quality_Score_mean'].mean():.2f}
+        
+        Energy Consumption (Wh):
+        - Most Efficient: {metrics_df['Energy_Wh_mean'].min():.2f} ({metrics_df.loc[metrics_df['Energy_Wh_mean'].idxmin(), 'Model']})
+        - Least Efficient: {metrics_df['Energy_Wh_mean'].max():.2f} ({metrics_df.loc[metrics_df['Energy_Wh_mean'].idxmax(), 'Model']})
+        - Average: {metrics_df['Energy_Wh_mean'].mean():.2f}
+        
+        Latency (ms):
+        - Fastest: {metrics_df['Latency_ms_mean'].min():.2f} ({metrics_df.loc[metrics_df['Latency_ms_mean'].idxmin(), 'Model']})
+        - Slowest: {metrics_df['Latency_ms_mean'].max():.2f} ({metrics_df.loc[metrics_df['Latency_ms_mean'].idxmax(), 'Model']})
+        - Average: {metrics_df['Latency_ms_mean'].mean():.2f}
+        
+        Task Categories: {', '.join(raw_df['Task_Category'].unique())}
+        """
+        
+        prompt = f"""
+        Analyze this AI model benchmarking data and provide insights:
+        
+        {data_summary}
+        
+        Please provide:
+        1. Key performance insights
+        2. Model recommendations for different use cases
+        3. Trade-offs between quality, speed, and energy efficiency
+        4. Notable patterns or outliers
+        
+        Keep the response concise and actionable.
+        """
+        
+        return call_mistral_api(prompt)
     except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return create_sample_data()
+        return f"Error generating AI insights: {e}"
 
-def process_metrics_csv(df):
-    """Process the metrics CSV file to create proper data structure"""
-    # The CSV already has aggregated metrics, we need to create individual task data
-    data = []
-    
-    for _, row in df.iterrows():
-        model = row['Model']
-        model_size = row['Model_Size']
-        quality_mean = row['Quality_Score_mean']
-        quality_std = row['Quality_Score_std']
-        latency_mean = row['Latency_sec_mean'] * 1000  # Convert to ms
-        latency_std = row['Latency_sec_std'] * 1000
-        energy_mean = row['Energy_kWh_mean'] * 1000  # Convert to Wh
-        energy_std = row['Energy_kWh_std'] * 1000
-        co2_mean = row['CO2_kg_mean'] * 1000  # Convert to g
-        co2_std = row['CO2_kg_std'] * 1000
-        
-        # Create 30 tasks per model with realistic variation
-        for task_id in range(1, 31):
-            quality = max(1, min(5, np.random.normal(quality_mean, quality_std)))
-            latency = max(100, np.random.normal(latency_mean, latency_std))
-            energy = max(1, np.random.normal(energy_mean, energy_std))
-            co2 = max(0.5, np.random.normal(co2_mean, co2_std))
+def load_excel_data():
+    """Load data from Excel file"""
+    try:
+        excel_file = 'ComparAI_Benchmark_Template_v2 (3).xlsx'
+        if os.path.exists(excel_file):
+            # Read the 'Runs' sheet which contains the detailed data
+            df = pd.read_excel(excel_file, sheet_name='Runs')
             
-            categories = ['Text Generation', 'Code Generation', 'Question Answering', 'Summarization', 'Translation', 'Advanced']
-            category = categories[(task_id - 1) // 5] if task_id <= 25 else 'Advanced'
+            # Clean the data
+            df = df.dropna(subset=['Model', 'Quality (1-5)', 'Latency (milli sec)', 'Energy(wh)', 'co2 (g)'])
             
-            data.append({
-                'Task_ID': task_id,
-                'Task_Category': category,
-                'Model': model,
-                'Model_Size': model_size,
-                'Quality_Score': quality,
-                'Latency_ms': latency,
-                'Energy_Wh': energy,
-                'CO2_g': co2,
-                'Notes': ''
+            # Rename columns for consistency
+            df = df.rename(columns={
+                'Quality (1-5)': 'Quality_Score',
+                'Latency (milli sec)': 'Latency_ms',
+                'Energy(wh)': 'Energy_Wh',
+                'co2 (g)': 'CO2_g',
+                'Prompt Category': 'Task_Category'
             })
-    
-    return pd.DataFrame(data)
-
-def create_sample_data():
-    """Create sample data for demonstration"""
-    np.random.seed(42)
-    
-    models = ['GPT-4', 'Claude-3', 'Llama-2', 'Mistral-7B', 'PaLM-2', 'Gemini-Pro']
-    model_sizes = ['Large', 'Large', 'Large', 'Small', 'Large', 'Large']
-    categories = ['Text Generation', 'Code Generation', 'Question Answering', 'Summarization', 'Translation']
-    
-    data = []
-    for task_id in range(1, 31):
-        category = categories[(task_id - 1) // 6] if task_id <= 25 else 'Advanced'
-        
-        for i, model in enumerate(models):
-            if 'Small' in model_sizes[i]:
-                quality = np.random.normal(3.2, 0.8)
-                latency = np.random.normal(2500, 500)  # ms
-                energy = np.random.normal(150, 30)  # Wh
-            else:
-                quality = np.random.normal(4.3, 0.5)
-                latency = np.random.normal(6800, 1200)  # ms
-                energy = np.random.normal(850, 150)  # Wh
             
-            if task_id > 20:
-                quality *= 0.9
-                latency *= 1.3
-                energy *= 1.2
+            # Add model size based on model name
+            def get_model_size(model):
+                if 'GPT-5' in model or 'DeepSeek' in model:
+                    return 'Large'
+                elif 'GPT-OSS' in model or '8B' in model:
+                    return 'Medium'
+                else:
+                    return 'Small'
             
-            co2 = energy * 0.5  # Rough conversion factor (Wh to g CO2)
+            df['Model_Size'] = df['Model'].apply(get_model_size)
             
-            data.append({
-                'Task_ID': task_id,
-                'Task_Category': category,
-                'Model': model,
-                'Model_Size': model_sizes[i],
-                'Quality_Score': max(1, min(5, quality)),
-                'Latency_ms': max(100, latency),
-                'Energy_Wh': max(1, energy),
-                'CO2_g': max(0.5, co2),
-                'Notes': ''
-            })
-    
-    return pd.DataFrame(data)
+            return df
+        else:
+            st.error("Excel file not found!")
+            return None
+    except Exception as e:
+        st.error(f"Error loading Excel data: {e}")
+        return None
 
 def calculate_metrics(df):
-    """Calculate aggregated metrics by model"""
-    metrics = df.groupby(['Model', 'Model_Size']).agg({
+    """Calculate aggregated metrics"""
+    metrics = df.groupby('Model').agg({
         'Quality_Score': ['mean', 'std', 'min', 'max', 'count'],
         'Latency_ms': ['mean', 'std', 'min', 'max'],
         'Energy_Wh': ['mean', 'std', 'sum'],
-        'CO2_g': ['mean', 'std', 'sum']
-    }).round(3)
+        'CO2_g': ['mean', 'std', 'sum'],
+        'Model_Size': 'first'
+    }).round(2)
     
     # Flatten column names
-    metrics.columns = ['_'.join(col).strip() for col in metrics.columns]
+    metrics.columns = ['_'.join(col).strip() for col in metrics.columns.values]
     metrics = metrics.reset_index()
     
-    # Calculate efficiency scores
-    metrics['Quality_Efficiency'] = metrics['Quality_Score_mean'] / (metrics['Energy_Wh_mean'] / 1000)
-    metrics['Speed_Efficiency'] = metrics['Quality_Score_mean'] / (metrics['Latency_ms_mean'] / 1000)
-    
-    # Calculate additional metrics
-    metrics['Quality_Consistency'] = 1 - (metrics['Quality_Score_std'] / metrics['Quality_Score_mean'])
-    metrics['Latency_Consistency'] = 1 - (metrics['Latency_ms_std'] / metrics['Latency_ms_mean'])
-    metrics['Energy_Consistency'] = 1 - (metrics['Energy_Wh_std'] / metrics['Energy_Wh_mean'])
-    
-    # Calculate environmental impact
-    metrics['Environmental_Impact'] = (metrics['CO2_g_mean'] / 1000 * 0.7 + (metrics['Energy_Wh_mean'] / 1000) * 0.3)
-    metrics['Energy_Per_Quality_Point'] = (metrics['Energy_Wh_mean'] / 1000) / metrics['Quality_Score_mean']
+    # Calculate efficiency metrics
+    metrics['Quality_Efficiency'] = metrics['Quality_Score_mean'] / metrics['Energy_Wh_mean']
+    metrics['Speed_Efficiency'] = metrics['Quality_Score_mean'] / metrics['Latency_ms_mean']
+    metrics['Environmental_Impact'] = metrics['CO2_g_mean'] / metrics['Quality_Score_mean']
     
     return metrics
 
 def main():
     st.title("🤖 ComparAI Benchmarking Dashboard")
-    st.markdown("**Intelligent LLM Performance Analysis with Mistral AI Integration**")
+    st.markdown("**Real Data from Excel File**")
+    
+    # Load data
+    df = load_excel_data()
+    if df is None:
+        st.stop()
+    
+    # Calculate metrics
+    metrics_df = calculate_metrics(df)
     
     # Sidebar
     st.sidebar.header("📊 Dashboard Controls")
-    
-    # AI Status
-    ai_status = "✅ Connected" if get_mistral_client() else "❌ Offline"
-    st.sidebar.metric("AI Status", ai_status)
-    
-    # Load data
-    df = load_real_data()
-    metrics = calculate_metrics(df)
     
     # Model selection
     selected_models = st.sidebar.multiselect(
         "Select Models",
         options=df['Model'].unique(),
-        default=df['Model'].unique()[:3]
+        default=df['Model'].unique()
+    )
+    
+    # Task category filter
+    selected_categories = st.sidebar.multiselect(
+        "Select Task Categories",
+        options=df['Task_Category'].unique(),
+        default=df['Task_Category'].unique()
     )
     
     # Filter data
-    filtered_df = df[df['Model'].isin(selected_models)]
-    filtered_metrics = calculate_metrics(filtered_df)
+    filtered_df = df[
+        (df['Model'].isin(selected_models)) & 
+        (df['Task_Category'].isin(selected_categories))
+    ]
+    
+    filtered_metrics = metrics_df[metrics_df['Model'].isin(selected_models)]
     
     # Main content
     col1, col2, col3, col4 = st.columns(4)
@@ -204,48 +193,176 @@ def main():
     
     with col3:
         total_energy = filtered_metrics['Energy_Wh_sum'].sum()
-        st.metric("Total Energy (Wh)", f"{total_energy:.1f}")
+        st.metric("Total Energy (Wh)", f"{total_energy:.0f}")
     
     with col4:
         total_co2 = filtered_metrics['CO2_g_sum'].sum()
-        st.metric("Total CO₂ (g)", f"{total_co2:.1f}")
+        st.metric("Total CO₂ (g)", f"{total_co2:.0f}")
     
-    # AI Insights
-    st.header("🤖 AI-Powered Insights")
+    # Quality vs Energy plot
+    st.header("⚡ Quality vs Energy Consumption")
+    fig1 = px.scatter(
+        filtered_metrics, 
+        x='Energy_Wh_mean', 
+        y='Quality_Score_mean',
+        color='Model_Size_first',
+        size='Latency_ms_mean',
+        hover_data=['Model', 'Latency_ms_mean', 'CO2_g_mean'],
+        title="Quality vs Energy Consumption",
+        labels={
+            'Energy_Wh_mean': 'Average Energy Consumption (Wh)',
+            'Quality_Score_mean': 'Average Quality Score (1-5)',
+            'Model_Size_first': 'Model Size'
+        }
+    )
+    st.plotly_chart(fig1, use_container_width=True)
     
-    if st.button("Generate AI Insights"):
-        with st.spinner("AI is analyzing your data..."):
-            prompt = f"""
-            Analyze this LLM benchmarking data and provide 3-5 key insights:
-            
-            Models: {', '.join(filtered_metrics['Model'].tolist())}
-            Best Quality: {filtered_metrics.loc[filtered_metrics['Quality_Score_mean'].idxmax(), 'Model']} ({filtered_metrics['Quality_Score_mean'].max():.2f}/5)
-            Fastest: {filtered_metrics.loc[filtered_metrics['Latency_ms_mean'].idxmin(), 'Model']} ({filtered_metrics['Latency_ms_mean'].min():.0f}ms)
-            Most Energy Efficient: {filtered_metrics.loc[filtered_metrics['Energy_Wh_mean'].idxmin(), 'Model']} ({filtered_metrics['Energy_Wh_mean'].min():.0f}Wh)
-            
-            Focus on: key findings, best model recommendations, and trade-offs. Keep it concise and actionable.
-            """
-            
-            ai_response = call_mistral_api(prompt)
-            
-            if "Error calling Mistral API" not in ai_response:
-                st.success("✅ AI Analysis Complete")
-                st.markdown("### 🎯 **Key Insights**")
-                st.markdown(ai_response)
-            else:
-                st.warning("⚠️ AI temporarily unavailable. Showing basic insights:")
-                st.markdown("### 📊 **Basic Analysis**")
-                best_quality = filtered_metrics.loc[filtered_metrics['Quality_Score_mean'].idxmax()]
-                fastest = filtered_metrics.loc[filtered_metrics['Latency_ms_mean'].idxmin()]
-                most_efficient = filtered_metrics.loc[filtered_metrics['Energy_Wh_mean'].idxmin()]
-                
-                st.markdown(f"• **Best Quality:** {best_quality['Model']} ({best_quality['Quality_Score_mean']:.2f}/5)")
-                st.markdown(f"• **Fastest:** {fastest['Model']} ({fastest['Latency_ms_mean']:.0f}ms)")
-                st.markdown(f"• **Most Energy Efficient:** {most_efficient['Model']} ({most_efficient['Energy_Wh_mean']:.0f}Wh)")
+    # Quality vs Latency plot
+    st.header("⏱️ Quality vs Latency")
+    fig2 = px.scatter(
+        filtered_metrics, 
+        x='Latency_ms_mean', 
+        y='Quality_Score_mean',
+        color='Model_Size_first',
+        size='Energy_Wh_mean',
+        hover_data=['Model', 'Energy_Wh_mean', 'CO2_g_mean'],
+        title="Quality vs Latency",
+        labels={
+            'Latency_ms_mean': 'Average Latency (ms)',
+            'Quality_Score_mean': 'Average Quality Score (1-5)',
+            'Model_Size_first': 'Model Size'
+        }
+    )
+    st.plotly_chart(fig2, use_container_width=True)
+    
+    # Task category analysis
+    st.header("📊 Performance by Task Category")
+    
+    category_metrics = filtered_df.groupby(['Model', 'Task_Category']).agg({
+        'Quality_Score': 'mean',
+        'Latency_ms': 'mean',
+        'Energy_Wh': 'mean',
+        'CO2_g': 'mean'
+    }).reset_index()
+    
+    fig3 = px.bar(
+        category_metrics,
+        x='Task_Category',
+        y='Quality_Score',
+        color='Model',
+        title="Quality Score by Task Category",
+        labels={
+            'Quality_Score': 'Average Quality Score',
+            'Task_Category': 'Task Category'
+        }
+    )
+    st.plotly_chart(fig3, use_container_width=True)
+    
+    # Performance comparison
+    st.header("📊 Model Performance Comparison")
+    
+    # Create comparison chart
+    fig4 = go.Figure()
+    
+    # Add bars for each metric
+    fig4.add_trace(go.Bar(
+        name='Quality Score',
+        x=filtered_metrics['Model'],
+        y=filtered_metrics['Quality_Score_mean'],
+        yaxis='y',
+        offsetgroup=1
+    ))
+    
+    fig4.add_trace(go.Bar(
+        name='Energy (Wh)',
+        x=filtered_metrics['Model'],
+        y=filtered_metrics['Energy_Wh_mean'],
+        yaxis='y2',
+        offsetgroup=2
+    ))
+    
+    fig4.add_trace(go.Bar(
+        name='Latency (ms)',
+        x=filtered_metrics['Model'],
+        y=filtered_metrics['Latency_ms_mean'],
+        yaxis='y3',
+        offsetgroup=3
+    ))
+    
+    fig4.update_layout(
+        title="Model Performance Comparison",
+        xaxis_title="Model",
+        yaxis=dict(title="Quality Score", side="left"),
+        yaxis2=dict(title="Energy (Wh)", side="right", overlaying="y"),
+        yaxis3=dict(title="Latency (ms)", side="right", overlaying="y", position=0.85),
+        barmode='group'
+    )
+    
+    st.plotly_chart(fig4, use_container_width=True)
     
     # Data table
-    st.header("📊 Model Performance Data")
-    st.dataframe(filtered_metrics[['Model', 'Model_Size', 'Quality_Score_mean', 'Latency_ms_mean', 'Energy_Wh_mean', 'CO2_g_mean']].round(2), use_container_width=True)
+    st.header("📋 Model Performance Data")
+    display_df = filtered_metrics[['Model', 'Model_Size_first', 'Quality_Score_mean', 'Latency_ms_mean', 'Energy_Wh_mean', 'CO2_g_mean']].round(2)
+    display_df.columns = ['Model', 'Size', 'Quality (1-5)', 'Latency (ms)', 'Energy (Wh)', 'CO2 (g)']
+    st.dataframe(display_df, use_container_width=True)
+    
+    # Model rankings
+    st.header("🏆 Model Rankings")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.subheader("Best Quality")
+        best_quality = filtered_metrics.nlargest(3, 'Quality_Score_mean')[['Model', 'Quality_Score_mean']]
+        st.dataframe(best_quality, use_container_width=True)
+    
+    with col2:
+        st.subheader("Most Energy Efficient")
+        most_efficient = filtered_metrics.nsmallest(3, 'Energy_Wh_mean')[['Model', 'Energy_Wh_mean']]
+        st.dataframe(most_efficient, use_container_width=True)
+    
+    with col3:
+        st.subheader("Fastest")
+        fastest = filtered_metrics.nsmallest(3, 'Latency_ms_mean')[['Model', 'Latency_ms_mean']]
+        st.dataframe(fastest, use_container_width=True)
+    
+    # AI Insights section
+    st.header("🤖 AI-Powered Insights & Analysis")
+    
+    col1, col2 = st.columns([3, 1])
+    
+    with col1:
+        if st.button("🔍 Generate AI Insights", type="primary"):
+            with st.spinner("Generating AI insights..."):
+                insights = generate_ai_insights(filtered_metrics, filtered_df)
+                st.markdown("### 📊 AI Analysis")
+                st.markdown(insights)
+    
+    with col2:
+        st.markdown("### 💬 Ask a Question")
+        user_question = st.text_input("Ask about the data:", placeholder="Which model is best for code generation?")
+        
+        if user_question and st.button("Ask AI"):
+            with st.spinner("Thinking..."):
+                # Prepare context for the question
+                context = f"""
+                Based on this data:
+                {filtered_metrics[['Model', 'Quality_Score_mean', 'Latency_ms_mean', 'Energy_Wh_mean', 'CO2_g_mean']].to_string()}
+                
+                Task categories available: {', '.join(filtered_df['Task_Category'].unique())}
+                
+                Question: {user_question}
+                """
+                
+                answer = call_mistral_api(context)
+                st.markdown("### 🤖 AI Response")
+                st.markdown(answer)
+    
+    # Raw data view
+    st.header("🔍 Raw Data View")
+    st.subheader("Individual Task Results")
+    raw_display = filtered_df[['Model', 'Task_Category', 'Quality_Score', 'Latency_ms', 'Energy_Wh', 'CO2_g']].round(2)
+    st.dataframe(raw_display, use_container_width=True)
 
 if __name__ == "__main__":
     main()
