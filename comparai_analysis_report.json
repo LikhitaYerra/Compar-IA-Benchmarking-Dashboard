@@ -1,0 +1,618 @@
+{
+  "timestamp": "2025-10-02T13:59:23.685195",
+  "summary": {
+    "total_models": 6,
+    "total_tasks": 30,
+    "total_runs": 180
+  },
+  "metrics": [
+    {
+      "Model": "DeepSeek R1",
+      "Model_Size": "Large",
+      "Quality_Score_mean": 4.067,
+      "Quality_Score_std": 1.143,
+      "Quality_Score_min": 0.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 4.0,
+      "Latency_sec_mean": 24.61,
+      "Latency_sec_std": 16.158,
+      "Latency_sec_min": 3.3,
+      "Latency_sec_max": 59.83,
+      "Latency_sec_median": 19.805,
+      "Energy_kWh_mean": 37.533,
+      "Energy_kWh_std": 19.488,
+      "Energy_kWh_sum": 1126.0,
+      "CO2_kg_mean": 24.033,
+      "CO2_kg_std": 12.843,
+      "CO2_kg_sum": 721.0,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 0.1083579783124184,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.16525802519301097,
+      "Quality_Consistency": 0.7189574625030735,
+      "Latency_Consistency": 0.34343762698090197,
+      "Energy_Consistency": 0.48077691631364405,
+      "Environmental_Impact": 28.083,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 9.228669781165479,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 5.0,
+      "Latency_Range": 56.53,
+      "Quality_Reliability": 0.2810425374969265,
+      "Latency_Reliability": 0.656562373019098
+    },
+    {
+      "Model": "GPT-5",
+      "Model_Size": "Large",
+      "Quality_Score_mean": 4.533,
+      "Quality_Score_std": 0.73,
+      "Quality_Score_min": 3.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 5.0,
+      "Latency_sec_mean": 24.443,
+      "Latency_sec_std": 16.354,
+      "Latency_sec_min": 3.41,
+      "Latency_sec_max": 59.8,
+      "Latency_sec_median": 19.55,
+      "Energy_kWh_mean": 22.5,
+      "Energy_kWh_std": 12.019,
+      "Energy_kWh_sum": 675.0,
+      "CO2_kg_mean": 14.4,
+      "CO2_kg_std": 7.726,
+      "CO2_kg_sum": 432.0,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 0.20146666666666668,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.1854518676103588,
+      "Quality_Consistency": 0.8389587469666887,
+      "Latency_Consistency": 0.3309331915067709,
+      "Energy_Consistency": 0.46582222222222225,
+      "Environmental_Impact": 16.83,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 4.963600264725347,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 2.0,
+      "Latency_Range": 56.39,
+      "Quality_Reliability": 0.16104125303331127,
+      "Latency_Reliability": 0.6690668084932291
+    },
+    {
+      "Model": "GPT-OSS 20B",
+      "Model_Size": "Medium",
+      "Quality_Score_mean": 4.667,
+      "Quality_Score_std": 0.606,
+      "Quality_Score_min": 3.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 5.0,
+      "Latency_sec_mean": 14.534,
+      "Latency_sec_std": 15.539,
+      "Latency_sec_min": 0.4,
+      "Latency_sec_max": 56.0,
+      "Latency_sec_median": 7.795,
+      "Energy_kWh_mean": 0.955,
+      "Energy_kWh_std": 0.992,
+      "Energy_kWh_sum": 28.66,
+      "CO2_kg_mean": 0.45,
+      "CO2_kg_std": 0.427,
+      "CO2_kg_sum": 13.49,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 4.886910994764398,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.3211091234347048,
+      "Quality_Consistency": 0.8701521319905721,
+      "Latency_Consistency": -0.06914820421081602,
+      "Energy_Consistency": -0.03874345549738223,
+      "Environmental_Impact": 0.6014999999999999,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 0.20462824083994,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 2.0,
+      "Latency_Range": 55.6,
+      "Quality_Reliability": 0.1298478680094279,
+      "Latency_Reliability": 1.069148204210816
+    },
+    {
+      "Model": "Gemma 8B",
+      "Model_Size": "Small",
+      "Quality_Score_mean": 4.533,
+      "Quality_Score_std": 0.629,
+      "Quality_Score_min": 3.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 5.0,
+      "Latency_sec_mean": 13.511,
+      "Latency_sec_std": 15.61,
+      "Latency_sec_min": 0.2,
+      "Latency_sec_max": 52.55,
+      "Latency_sec_median": 7.185,
+      "Energy_kWh_mean": 1.837,
+      "Energy_kWh_std": 1.966,
+      "Energy_kWh_sum": 55.1,
+      "CO2_kg_mean": 1.113,
+      "CO2_kg_std": 1.173,
+      "CO2_kg_sum": 33.39,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 2.4676102340773003,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.3355044038191104,
+      "Quality_Consistency": 0.8612397970439003,
+      "Latency_Consistency": -0.1553548960106581,
+      "Energy_Consistency": -0.07022318998366894,
+      "Environmental_Impact": 1.3301999999999998,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 0.40525038605779834,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 2.0,
+      "Latency_Range": 52.349999999999994,
+      "Quality_Reliability": 0.1387602029560997,
+      "Latency_Reliability": 1.155354896010658
+    },
+    {
+      "Model": "Meta LLaMA 3.1 8B",
+      "Model_Size": "Small",
+      "Quality_Score_mean": 4.567,
+      "Quality_Score_std": 0.898,
+      "Quality_Score_min": 1.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 5.0,
+      "Latency_sec_mean": 13.725,
+      "Latency_sec_std": 15.592,
+      "Latency_sec_min": 0.13,
+      "Latency_sec_max": 53.37,
+      "Latency_sec_median": 7.065,
+      "Energy_kWh_mean": 1.575,
+      "Energy_kWh_std": 1.443,
+      "Energy_kWh_sum": 47.26,
+      "CO2_kg_mean": 0.963,
+      "CO2_kg_std": 0.814,
+      "CO2_kg_sum": 28.88,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 2.89968253968254,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.3327504553734062,
+      "Quality_Consistency": 0.8033720166411211,
+      "Latency_Consistency": -0.13602914389799636,
+      "Energy_Consistency": 0.08380952380952378,
+      "Environmental_Impact": 1.1465999999999998,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 0.3448653382964747,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 4.0,
+      "Latency_Range": 53.239999999999995,
+      "Quality_Reliability": 0.1966279833588789,
+      "Latency_Reliability": 1.1360291438979964
+    },
+    {
+      "Model": "Mistral Small",
+      "Model_Size": "Medium",
+      "Quality_Score_mean": 4.333,
+      "Quality_Score_std": 1.269,
+      "Quality_Score_min": 0.0,
+      "Quality_Score_max": 5.0,
+      "Quality_Score_count": 30,
+      "Quality_Score_median": 5.0,
+      "Latency_sec_mean": 14.179,
+      "Latency_sec_std": 15.23,
+      "Latency_sec_min": 0.5,
+      "Latency_sec_max": 55.56,
+      "Latency_sec_median": 7.685,
+      "Energy_kWh_mean": 2.708,
+      "Energy_kWh_std": 2.146,
+      "Energy_kWh_sum": 81.24,
+      "CO2_kg_mean": 1.663,
+      "CO2_kg_std": 1.26,
+      "CO2_kg_sum": 49.9,
+      "Cost_EUR_mean": 0.0,
+      "Cost_EUR_std": 0.0,
+      "Cost_EUR_sum": 0.0,
+      "Quality_Efficiency": 1.6000738552437224,
+      "Cost_Efficiency": Infinity,
+      "Speed_Efficiency": 0.3055927780520488,
+      "Quality_Consistency": 0.7071313177936764,
+      "Latency_Consistency": -0.0741237040693985,
+      "Energy_Consistency": 0.20753323485967512,
+      "Environmental_Impact": 1.9765,
+      "Cost_Per_Quality_Point": 0.0,
+      "Energy_Per_Quality_Point": 0.6249711516270483,
+      "Task_Completion_Rate": 1.0,
+      "Quality_Range": 5.0,
+      "Latency_Range": 55.06,
+      "Quality_Reliability": 0.2928686822063235,
+      "Latency_Reliability": 1.0741237040693985
+    }
+  ],
+  "statistical_analysis": {
+    "overall": {
+      "total_tasks": "30",
+      "total_models": "6",
+      "total_runs": "180",
+      "date_range": "nan to nan"
+    },
+    "by_size": {
+      "Quality_Score": {
+        "Large": "4.3",
+        "Medium": "4.5",
+        "Small": "4.55"
+      },
+      "Latency_sec": {
+        "Large": "24.526",
+        "Medium": "14.357",
+        "Small": "13.618"
+      },
+      "Energy_kWh": {
+        "Large": "30.017",
+        "Medium": "1.832",
+        "Small": "1.706"
+      },
+      "CO2_kg": {
+        "Large": "19.217",
+        "Medium": "1.056",
+        "Small": "1.038"
+      }
+    },
+    "by_category": {
+      "('Quality_Score', 'mean')": {
+        "Advanced / multi-step": "4.667",
+        "Easy factual & rewriting": "4.167",
+        "Harder knowledge & reasoning": "4.567",
+        "Programming & debugging": "4.533",
+        "Reasoning & quantitative": "4.6"
+      },
+      "('Quality_Score', 'std')": {
+        "Advanced / multi-step": "0.606",
+        "Easy factual & rewriting": "1.278",
+        "Harder knowledge & reasoning": "0.626",
+        "Programming & debugging": "0.73",
+        "Reasoning & quantitative": "0.621"
+      },
+      "('Latency_sec', 'mean')": {
+        "Advanced / multi-step": "24.693",
+        "Easy factual & rewriting": "8.502",
+        "Harder knowledge & reasoning": "29.536",
+        "Programming & debugging": "18.442",
+        "Reasoning & quantitative": "15.326"
+      },
+      "('Latency_sec', 'std')": {
+        "Advanced / multi-step": "18.932",
+        "Easy factual & rewriting": "10.637",
+        "Harder knowledge & reasoning": "16.338",
+        "Programming & debugging": "15.529",
+        "Reasoning & quantitative": "13.008"
+      },
+      "('Energy_kWh', 'mean')": {
+        "Advanced / multi-step": "12.788",
+        "Easy factual & rewriting": "9.012",
+        "Harder knowledge & reasoning": "14.236",
+        "Programming & debugging": "11.017",
+        "Reasoning & quantitative": "11.044"
+      },
+      "('Energy_kWh', 'std')": {
+        "Advanced / multi-step": "16.001",
+        "Easy factual & rewriting": "16.427",
+        "Harder knowledge & reasoning": "16.713",
+        "Programming & debugging": "16.058",
+        "Reasoning & quantitative": "19.765"
+      }
+    },
+    "correlations": {
+      "Quality_Score": {
+        "Quality_Score": "1.0",
+        "Latency_sec": "0.026439446084998784",
+        "Energy_kWh": "-0.15362706484877584",
+        "CO2_kg": "-0.17945358115848956",
+        "Cost_EUR": "nan"
+      },
+      "Latency_sec": {
+        "Quality_Score": "0.026439446084998784",
+        "Latency_sec": "1.0",
+        "Energy_kWh": "0.4093428202926799",
+        "CO2_kg": "0.43449389207749756",
+        "Cost_EUR": "nan"
+      },
+      "Energy_kWh": {
+        "Quality_Score": "-0.15362706484877584",
+        "Latency_sec": "0.4093428202926799",
+        "Energy_kWh": "1.0",
+        "CO2_kg": "0.9252866038801496",
+        "Cost_EUR": "nan"
+      },
+      "CO2_kg": {
+        "Quality_Score": "-0.17945358115848956",
+        "Latency_sec": "0.43449389207749756",
+        "Energy_kWh": "0.9252866038801496",
+        "CO2_kg": "1.0",
+        "Cost_EUR": "nan"
+      },
+      "Cost_EUR": {
+        "Quality_Score": "nan",
+        "Latency_sec": "nan",
+        "Energy_kWh": "nan",
+        "CO2_kg": "nan",
+        "Cost_EUR": "nan"
+      }
+    },
+    "rankings": {
+      "Quality_Score_mean": [
+        {
+          "Model": "GPT-OSS 20B",
+          "Quality_Score_mean": "4.667"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Quality_Score_mean": "4.567"
+        },
+        {
+          "Model": "GPT-5",
+          "Quality_Score_mean": "4.533"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Quality_Score_mean": "4.533"
+        },
+        {
+          "Model": "Mistral Small",
+          "Quality_Score_mean": "4.333"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Quality_Score_mean": "4.067"
+        }
+      ],
+      "Latency_sec_mean": [
+        {
+          "Model": "Gemma 8B",
+          "Latency_sec_mean": "13.511"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Latency_sec_mean": "13.725"
+        },
+        {
+          "Model": "Mistral Small",
+          "Latency_sec_mean": "14.179"
+        },
+        {
+          "Model": "GPT-OSS 20B",
+          "Latency_sec_mean": "14.534"
+        },
+        {
+          "Model": "GPT-5",
+          "Latency_sec_mean": "24.443"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Latency_sec_mean": "24.61"
+        }
+      ],
+      "Energy_kWh_mean": [
+        {
+          "Model": "GPT-OSS 20B",
+          "Energy_kWh_mean": "0.955"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Energy_kWh_mean": "1.575"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Energy_kWh_mean": "1.837"
+        },
+        {
+          "Model": "Mistral Small",
+          "Energy_kWh_mean": "2.708"
+        },
+        {
+          "Model": "GPT-5",
+          "Energy_kWh_mean": "22.5"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Energy_kWh_mean": "37.533"
+        }
+      ],
+      "CO2_kg_mean": [
+        {
+          "Model": "GPT-OSS 20B",
+          "CO2_kg_mean": "0.45"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "CO2_kg_mean": "0.963"
+        },
+        {
+          "Model": "Gemma 8B",
+          "CO2_kg_mean": "1.113"
+        },
+        {
+          "Model": "Mistral Small",
+          "CO2_kg_mean": "1.663"
+        },
+        {
+          "Model": "GPT-5",
+          "CO2_kg_mean": "14.4"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "CO2_kg_mean": "24.033"
+        }
+      ],
+      "Cost_EUR_mean": [
+        {
+          "Model": "DeepSeek R1",
+          "Cost_EUR_mean": "0.0"
+        },
+        {
+          "Model": "GPT-5",
+          "Cost_EUR_mean": "0.0"
+        },
+        {
+          "Model": "GPT-OSS 20B",
+          "Cost_EUR_mean": "0.0"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Cost_EUR_mean": "0.0"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Cost_EUR_mean": "0.0"
+        },
+        {
+          "Model": "Mistral Small",
+          "Cost_EUR_mean": "0.0"
+        }
+      ]
+    },
+    "efficiency": {
+      "Quality_Efficiency": [
+        {
+          "Model": "GPT-OSS 20B",
+          "Quality_Efficiency": "4.886910994764398"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Quality_Efficiency": "2.89968253968254"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Quality_Efficiency": "2.4676102340773003"
+        },
+        {
+          "Model": "Mistral Small",
+          "Quality_Efficiency": "1.6000738552437224"
+        },
+        {
+          "Model": "GPT-5",
+          "Quality_Efficiency": "0.20146666666666668"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Quality_Efficiency": "0.1083579783124184"
+        }
+      ],
+      "Cost_Efficiency": [
+        {
+          "Model": "DeepSeek R1",
+          "Cost_Efficiency": "inf"
+        },
+        {
+          "Model": "GPT-5",
+          "Cost_Efficiency": "inf"
+        },
+        {
+          "Model": "GPT-OSS 20B",
+          "Cost_Efficiency": "inf"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Cost_Efficiency": "inf"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Cost_Efficiency": "inf"
+        },
+        {
+          "Model": "Mistral Small",
+          "Cost_Efficiency": "inf"
+        }
+      ],
+      "Speed_Efficiency": [
+        {
+          "Model": "Gemma 8B",
+          "Speed_Efficiency": "0.3355044038191104"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Speed_Efficiency": "0.3327504553734062"
+        },
+        {
+          "Model": "GPT-OSS 20B",
+          "Speed_Efficiency": "0.3211091234347048"
+        },
+        {
+          "Model": "Mistral Small",
+          "Speed_Efficiency": "0.3055927780520488"
+        },
+        {
+          "Model": "GPT-5",
+          "Speed_Efficiency": "0.1854518676103588"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Speed_Efficiency": "0.16525802519301097"
+        }
+      ],
+      "Quality_Consistency": [
+        {
+          "Model": "GPT-OSS 20B",
+          "Quality_Consistency": "0.8701521319905721"
+        },
+        {
+          "Model": "Gemma 8B",
+          "Quality_Consistency": "0.8612397970439003"
+        },
+        {
+          "Model": "GPT-5",
+          "Quality_Consistency": "0.8389587469666887"
+        },
+        {
+          "Model": "Meta LLaMA 3.1 8B",
+          "Quality_Consistency": "0.8033720166411211"
+        },
+        {
+          "Model": "DeepSeek R1",
+          "Quality_Consistency": "0.7189574625030735"
+        },
+        {
+          "Model": "Mistral Small",
+          "Quality_Consistency": "0.7071313177936764"
+        }
+      ]
+    }
+  },
+  "insights": [
+    "\ud83e\udd47 **Best Overall Quality**: GPT-OSS 20B with 4.67 average quality score",
+    "\u26a1 **Most Energy Efficient**: GPT-OSS 20B with 4.89 quality points per kWh",
+    "\ud83d\udcb0 **Most Cost Efficient**: DeepSeek R1 with inf quality points per euro",
+    "\ud83c\udfc3 **Fastest Model**: Gemma 8B with 13.5s average latency",
+    "\ud83c\udf0d **Lowest CO\u2082 Impact**: GPT-OSS 20B with 0.450 kg CO\u2082 per task",
+    "\ud83c\udfaf **Most Consistent**: GPT-OSS 20B with 0.870 consistency score",
+    "\ud83d\udcf1 **Best Small Model**: Meta LLaMA 3.1 8B - ideal for resource-constrained environments",
+    "\u2696\ufe0f **Best Medium Model**: GPT-OSS 20B - good balance of performance and efficiency",
+    "\ud83d\ude80 **Best Large Model**: GPT-5 - maximum performance for critical tasks"
+  ],
+  "recommendations": [
+    "## \ud83c\udfaf Use Case Recommendations",
+    "",
+    "### High-Volume Production",
+    "**Recommended Model**: DeepSeek R1",
+    "**Description**: Best for high-volume, cost-sensitive applications",
+    "",
+    "### Environmental Focus",
+    "**Recommended Model**: DeepSeek R1",
+    "**Description**: Best for environmentally conscious applications",
+    "",
+    "### Quality Critical",
+    "**Recommended Model**: DeepSeek R1",
+    "**Description**: Best for applications where quality is paramount",
+    "",
+    "### Real-time Applications",
+    "**Recommended Model**: DeepSeek R1",
+    "**Description**: Best for real-time or low-latency requirements",
+    ""
+  ]
+}
