@@ -24,183 +24,156 @@ SIZE_COLORS = {
 PAGES_URL = "https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/"
 
 
-st.set_page_config(
-    page_title="Compar'IA | Sustainable LLM Dashboard",
-    page_icon="🌿",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
-
-
-st.markdown(
-    """
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-        html, body, [class*="css"] {
-            font-family: 'Inter', system-ui, sans-serif;
-        }
-        .stApp {
-            background: linear-gradient(180deg, #050a17 0, #050a17 180px, #f1f5f9 180px, #f1f5f9 100%);
-        }
-        header[data-testid="stHeader"] {
-            background: rgba(5, 10, 23, 0.92);
-        }
-        .block-container {
-            padding-top: 0.5rem;
-            padding-bottom: 2rem;
-            max-width: 100%;
-            padding-left: 2rem;
-            padding-right: 2rem;
-        }
-        #MainMenu, footer, header[data-testid="stHeader"] {
-            visibility: hidden;
-            height: 0;
-        }
-        div[data-testid="stPlotlyChart"] {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 22px;
-            padding: 8px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
-        }
-        div[data-testid="stTabs"] {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 18px;
-            padding: 8px 12px 16px 12px;
-            box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
-        }
-        div[data-testid="stTabs"] button[data-baseweb="tab"] {
-            font-weight: 600;
-            font-size: 0.92rem;
-        }
-        div[data-testid="stTabs"] button[aria-selected="true"] {
-            color: #047857 !important;
-        }
-        section[data-testid="stSidebar"] {
-            background: #0b1220;
-        }
-        section[data-testid="stSidebar"] .stMarkdown, 
-        section[data-testid="stSidebar"] label {
-            color: #e2e8f0 !important;
-        }
-        section[data-testid="stSidebar"] [data-baseweb="tag"] {
-            background: rgba(16,185,129,.18) !important;
-            color: #d1fae5 !important;
-            border: 1px solid rgba(16,185,129,.45) !important;
-        }
-        .kpi-row { margin: 0 0 22px 0; }
-        .section-title {
-            color: #0f172a;
-            font-size: 1.05rem;
-            font-weight: 700;
-            margin: 0 0 4px 0;
-        }
-        .section-desc {
-            color: #64748b;
-            font-size: 0.88rem;
-            margin: 0 0 12px 0;
-        }
-        .comparia-topbar {
-            background: rgba(5, 10, 23, 0.92);
-            border: 1px solid rgba(148,163,184,.18);
-            border-radius: 16px;
-            padding: 12px 18px;
-            margin-bottom: 18px;
-            color: #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .comparia-mark {
-            width: 30px; height: 30px; border-radius: 9px;
-            background: conic-gradient(from 220deg, #10b981, #38bdf8, #818cf8, #10b981);
-            display: inline-flex; align-items: center; justify-content: center;
-            color: #0b1220; font-weight: 900; font-size: 0.72rem;
-        }
-        .comparia-brand { font-weight: 800; letter-spacing: -.04em; font-size: 1.1rem; }
-        .hero-wrap {
-            color: #f8fafc;
-            padding: 8px 0 20px 0;
-        }
-        .hero-kicker {
-            color: #99f6e4;
-            font-weight: 700;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-            font-size: .78rem;
-        }
-        .hero-title {
-            font-size: clamp(1.8rem, 3.6vw, 2.8rem);
-            letter-spacing: -.06em;
-            line-height: 1.05;
-            margin: 8px 0 12px 0;
-            color: #f8fafc;
-        }
-        .hero-copy { color: #cbd5e1; font-size: 1rem; max-width: 720px; }
-        .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-        .pill {
-            font-size: .78rem; padding: 6px 12px; border-radius: 999px;
-            border: 1px solid rgba(16,185,129,.45); color: #d1fae5;
-            background: rgba(16,185,129,.12); font-weight: 600;
-        }
-        .stat {
-            background: rgba(15,23,42,.6);
-            border: 1px solid rgba(148,163,184,.22);
-            border-radius: 18px;
-            padding: 14px 16px;
-            color: #e2e8f0;
-            min-height: 92px;
-        }
-        .stat-label {
-            color: #94a3b8; text-transform: uppercase; font-size: .68rem;
-            letter-spacing: .12em; font-weight: 700;
-        }
-        .stat-value {
-            font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; margin-top: 4px;
-        }
-        .stat-meta { color: #94a3b8; font-size: .82rem; margin-top: 2px; }
-        .panel-card {
-            background: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 22px;
-            padding: 18px 20px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
-            margin-bottom: 12px;
-        }
-        .panel-card h3 {
-            margin: 0 0 4px 0;
-            font-size: 1.05rem;
-            color: #0f172a;
-        }
-        .panel-desc { color: #64748b; font-size: .88rem; margin-bottom: 10px; }
-        .control-bar {
-            display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
-            background: white; border: 1px solid #e5e7eb; border-radius: 18px;
-            padding: 14px 18px; margin-bottom: 14px;
-            box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
-        }
-        .rec-card {
-            border-radius: 18px; padding: 18px 20px; margin-bottom: 10px;
-        }
-        .rec-green { background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%); border: 1px solid #d1fae5; }
-        .rec-blue  { background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%); border: 1px solid #bae6fd; }
-        .rec-amber { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; }
-        .rec-purple{ background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%); border: 1px solid #f5d0fe; }
-        .rec-title { color: #047857; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
-        .rec-model { color: #0f172a; font-size: 1.35rem; font-weight: 800; margin: 6px 0; }
-        .rec-meta { color: #334155; font-size: .88rem; }
-        .size-badge {
-            display: inline-block; padding: 4px 10px; border-radius: 999px;
-            font-size: .74rem; font-weight: 700; margin-bottom: 8px;
-        }
-        .badge-small { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
-        .badge-medium { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
-        .badge-large { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+def configure_page() -> None:
+    """Run once at app start. Must not run at import time (Streamlit Cloud import safety)."""
+    st.set_page_config(
+        page_title="Compar'IA | Sustainable LLM Dashboard",
+        page_icon="🌿",
+        layout="wide",
+        initial_sidebar_state="collapsed",
+    )
+    st.markdown(
+        """
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+            html, body, [class*="css"] {
+                font-family: 'Inter', system-ui, sans-serif;
+            }
+            .stApp {
+                background: linear-gradient(180deg, #050a17 0, #050a17 180px, #f1f5f9 180px, #f1f5f9 100%);
+            }
+            header[data-testid="stHeader"] {
+                background: rgba(5, 10, 23, 0.92);
+            }
+            .block-container {
+                padding-top: 0.5rem;
+                padding-bottom: 2rem;
+                max-width: 100%;
+                padding-left: 2rem;
+                padding-right: 2rem;
+            }
+            #MainMenu, footer, header[data-testid="stHeader"] {
+                visibility: hidden;
+                height: 0;
+            }
+            div[data-testid="stPlotlyChart"] {
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 22px;
+                padding: 8px;
+                box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
+            }
+            div[data-testid="stTabs"] {
+                background: #ffffff;
+                border: 1px solid #e5e7eb;
+                border-radius: 18px;
+                padding: 8px 12px 16px 12px;
+                box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
+            }
+            div[data-testid="stTabs"] button[data-baseweb="tab"] {
+                font-weight: 600;
+                font-size: 0.92rem;
+            }
+            div[data-testid="stTabs"] button[aria-selected="true"] {
+                color: #047857 !important;
+            }
+            section[data-testid="stSidebar"] {
+                background: #0b1220;
+            }
+            section[data-testid="stSidebar"] .stMarkdown, 
+            section[data-testid="stSidebar"] label {
+                color: #e2e8f0 !important;
+            }
+            section[data-testid="stSidebar"] [data-baseweb="tag"] {
+                background: rgba(16,185,129,.18) !important;
+                color: #d1fae5 !important;
+                border: 1px solid rgba(16,185,129,.45) !important;
+            }
+            .section-title {
+                color: #0f172a;
+                font-size: 1.05rem;
+                font-weight: 700;
+                margin: 0 0 4px 0;
+            }
+            .section-desc {
+                color: #64748b;
+                font-size: 0.88rem;
+                margin: 0 0 12px 0;
+            }
+            .comparia-topbar {
+                background: rgba(5, 10, 23, 0.92);
+                border: 1px solid rgba(148,163,184,.18);
+                border-radius: 16px;
+                padding: 12px 18px;
+                margin-bottom: 18px;
+                color: #e2e8f0;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+            .comparia-mark {
+                width: 30px; height: 30px; border-radius: 9px;
+                background: conic-gradient(from 220deg, #10b981, #38bdf8, #818cf8, #10b981);
+                display: inline-flex; align-items: center; justify-content: center;
+                color: #0b1220; font-weight: 900; font-size: 0.72rem;
+            }
+            .comparia-brand { font-weight: 800; letter-spacing: -.04em; font-size: 1.1rem; }
+            .hero-wrap { color: #f8fafc; padding: 8px 0 20px 0; }
+            .hero-kicker {
+                color: #99f6e4; font-weight: 700; letter-spacing: .14em;
+                text-transform: uppercase; font-size: .78rem;
+            }
+            .hero-title {
+                font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+                letter-spacing: -.06em; line-height: 1.05;
+                margin: 8px 0 12px 0; color: #f8fafc;
+            }
+            .hero-copy { color: #cbd5e1; font-size: 1rem; max-width: 720px; }
+            .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+            .pill {
+                font-size: .78rem; padding: 6px 12px; border-radius: 999px;
+                border: 1px solid rgba(16,185,129,.45); color: #d1fae5;
+                background: rgba(16,185,129,.12); font-weight: 600;
+            }
+            .stat {
+                background: rgba(15,23,42,.6);
+                border: 1px solid rgba(148,163,184,.22);
+                border-radius: 18px; padding: 14px 16px;
+                color: #e2e8f0; min-height: 92px;
+            }
+            .stat-label {
+                color: #94a3b8; text-transform: uppercase; font-size: .68rem;
+                letter-spacing: .12em; font-weight: 700;
+            }
+            .stat-value {
+                font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; margin-top: 4px;
+            }
+            .stat-meta { color: #94a3b8; font-size: .82rem; margin-top: 2px; }
+            .panel-card {
+                background: #ffffff; border: 1px solid #e5e7eb;
+                border-radius: 22px; padding: 18px 20px;
+                box-shadow: 0 18px 45px rgba(15, 23, 42, .08); margin-bottom: 12px;
+            }
+            .panel-card h3 { margin: 0 0 4px 0; font-size: 1.05rem; color: #0f172a; }
+            .panel-desc { color: #64748b; font-size: .88rem; margin-bottom: 10px; }
+            .rec-card { border-radius: 18px; padding: 18px 20px; margin-bottom: 10px; }
+            .rec-green { background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%); border: 1px solid #d1fae5; }
+            .rec-blue  { background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%); border: 1px solid #bae6fd; }
+            .rec-amber { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; }
+            .rec-title { color: #047857; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+            .rec-model { color: #0f172a; font-size: 1.35rem; font-weight: 800; margin: 6px 0; }
+            .rec-meta { color: #334155; font-size: .88rem; }
+            .size-badge {
+                display: inline-block; padding: 4px 10px; border-radius: 999px;
+                font-size: .74rem; font-weight: 700; margin-bottom: 8px;
+            }
+            .badge-small { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+            .badge-medium { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+            .badge-large { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def clean_model_name(name: str) -> str:
@@ -709,6 +682,7 @@ def build_recommendations(metrics: pd.DataFrame) -> dict[str, pd.Series]:
 
 
 def main() -> None:
+    configure_page()
     raw_df, raw_message = load_raw_data()
     aggregated_df, aggregated_message = load_aggregated_data()
 
@@ -779,16 +753,16 @@ def main() -> None:
             "Sustainability Matrix",
             "Quality vs energy with latency as marker size and size class as colour. Hover a point for model details.",
         )
-        st.plotly_chart(build_matrix(metrics), width="stretch", key="overview_matrix")
+        st.plotly_chart(build_matrix(metrics), use_container_width=True, key="overview_matrix")
         c1, c2, c3 = st.columns([1, 1.2, 1.2])
         with c1:
             render_top_model_card(metrics.iloc[0])
         with c2:
             section_heading("Energy footprint", "Lower bars are greener choices.")
-            st.plotly_chart(build_energy_bar(metrics), width="stretch", key="overview_energy")
+            st.plotly_chart(build_energy_bar(metrics), use_container_width=True, key="overview_energy")
         with c3:
             section_heading("Latency", "Mean seconds per task.")
-            st.plotly_chart(build_latency_bar(metrics), width="stretch", key="overview_latency")
+            st.plotly_chart(build_latency_bar(metrics), use_container_width=True, key="overview_latency")
 
     with tabs[1]:
         section_heading(
@@ -806,15 +780,15 @@ def main() -> None:
             weight_cost = st.slider("Cost", 0.0, 1.0, 0.15, 0.05, key="weight_cost")
         weights = {"quality": weight_quality, "energy": weight_energy, "cost": weight_cost, "speed": weight_speed}
         metrics = prepare_metrics(base_metrics, weights)
-        st.plotly_chart(build_matrix(metrics), width="stretch", key="matrix_main")
+        st.plotly_chart(build_matrix(metrics), use_container_width=True, key="matrix_main")
 
     with tabs[2]:
         left, right = st.columns(2)
         with left:
-            st.plotly_chart(build_metric_heatmap(metrics), width="stretch", key="insights_heatmap")
+            st.plotly_chart(build_metric_heatmap(metrics), use_container_width=True, key="insights_heatmap")
         with right:
-            st.plotly_chart(build_parallel_coordinates(metrics), width="stretch", key="insights_parallel")
-        st.plotly_chart(build_ranking_chart(metrics), width="stretch", key="insights_ranking")
+            st.plotly_chart(build_parallel_coordinates(metrics), use_container_width=True, key="insights_parallel")
+        st.plotly_chart(build_ranking_chart(metrics), use_container_width=True, key="insights_ranking")
 
     with tabs[3]:
         recs = build_recommendations(metrics)
@@ -835,7 +809,7 @@ def main() -> None:
             "Sustainability_Score", "Footprint_Index",
         ]
         existing_cols = [col for col in display_cols if col in metrics.columns]
-        st.dataframe(metrics[existing_cols].round(4), width="stretch", hide_index=True, key="data_table")
+        st.dataframe(metrics[existing_cols].round(4), use_container_width=True, hide_index=True)
         st.markdown(
             """
             **Extending the dashboard**

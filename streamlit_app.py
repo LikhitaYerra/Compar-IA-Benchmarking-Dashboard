@@ -1,7 +1,6 @@
-"""Streamlit Cloud entry point for Compar'IA.
+"""Streamlit Cloud entry point.
 
-The deployed app uses dashboard.py (sustainability-aware multi-metric UI).
-Mistral AI integration is optional and not required to run the dashboard.
+Imports dashboard.main safely (dashboard.py has no Streamlit calls at import time).
 """
 
 from dashboard import main
