@@ -26,9 +26,9 @@ PAGES_URL = "https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/"
 
 st.set_page_config(
     page_title="Compar'IA | Sustainable LLM Dashboard",
-    page_icon="IA",
+    page_icon="🌿",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 
@@ -46,9 +46,60 @@ st.markdown(
             background: rgba(5, 10, 23, 0.92);
         }
         .block-container {
-            padding-top: 0.8rem;
-            padding-bottom: 2.4rem;
-            max-width: 1280px;
+            padding-top: 0.5rem;
+            padding-bottom: 2rem;
+            max-width: 100%;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+        #MainMenu, footer, header[data-testid="stHeader"] {
+            visibility: hidden;
+            height: 0;
+        }
+        div[data-testid="stPlotlyChart"] {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 22px;
+            padding: 8px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
+        }
+        div[data-testid="stTabs"] {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 18px;
+            padding: 8px 12px 16px 12px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, .05);
+        }
+        div[data-testid="stTabs"] button[data-baseweb="tab"] {
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+        div[data-testid="stTabs"] button[aria-selected="true"] {
+            color: #047857 !important;
+        }
+        section[data-testid="stSidebar"] {
+            background: #0b1220;
+        }
+        section[data-testid="stSidebar"] .stMarkdown, 
+        section[data-testid="stSidebar"] label {
+            color: #e2e8f0 !important;
+        }
+        section[data-testid="stSidebar"] [data-baseweb="tag"] {
+            background: rgba(16,185,129,.18) !important;
+            color: #d1fae5 !important;
+            border: 1px solid rgba(16,185,129,.45) !important;
+        }
+        .kpi-row { margin: 0 0 22px 0; }
+        .section-title {
+            color: #0f172a;
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+        .section-desc {
+            color: #64748b;
+            font-size: 0.88rem;
+            margin: 0 0 12px 0;
         }
         .comparia-topbar {
             background: rgba(5, 10, 23, 0.92);
@@ -146,16 +197,6 @@ st.markdown(
         .badge-small { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
         .badge-medium { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
         .badge-large { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
-        div[data-testid="stTabs"] button[data-baseweb="tab"] {
-            font-weight: 600;
-        }
-        section[data-testid="stSidebar"] {
-            background: #0b1220;
-            color: #e2e8f0;
-        }
-        section[data-testid="stSidebar"] * {
-            color: #e2e8f0 !important;
-        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -375,12 +416,12 @@ def prepare_metrics(metrics: pd.DataFrame, weights: dict[str, float]) -> pd.Data
 
 def render_topbar() -> None:
     st.markdown(
-        """
+        f"""
         <div class="comparia-topbar">
             <span class="comparia-mark">IA</span>
             <span class="comparia-brand">Compar'IA</span>
             <span style="margin-left:auto;color:#94a3b8;font-size:.85rem;">
-                Sustainable LLM benchmarking dashboard
+                Streamlit demo · <a href="{PAGES_URL}" target="_blank" style="color:#99f6e4;text-decoration:none;">HTML version</a>
             </span>
         </div>
         """,
@@ -389,48 +430,48 @@ def render_topbar() -> None:
 
 
 def render_hero(metrics: pd.DataFrame) -> None:
-    left, right = st.columns([1.5, 1])
-    with left:
-        st.markdown(
-            """
-            <div class="hero-wrap">
-                <div class="hero-kicker">Sustainability-Aware LLM Benchmarking</div>
-                <div class="hero-title">Choose LLMs that balance quality with energy, CO₂, latency and cost.</div>
-                <div class="hero-copy">
-                    Compar'IA replaces accuracy-only leaderboards with an interactive interface that links
-                    task quality to operational and environmental footprint.
-                </div>
-                <div class="pill-row">
-                    <span class="pill">Sustainability Matrix</span>
-                    <span class="pill">Normalized Multi-Metric Score</span>
-                    <span class="pill">CO₂-Aware Recommendations</span>
-                    <span class="pill">Extensible Schema</span>
-                </div>
+    st.markdown(
+        """
+        <div class="hero-wrap">
+            <div class="hero-kicker">Sustainability-Aware LLM Benchmarking</div>
+            <div class="hero-title">Choose LLMs that balance quality with energy, CO₂, latency and cost.</div>
+            <div class="hero-copy">
+                Compar'IA replaces accuracy-only leaderboards with an interactive interface that links
+                task quality to operational and environmental footprint.
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
-    with right:
-        stats = [
-            ("Models", f"{metrics['Model'].nunique()}", "in current dataset"),
-            ("Avg quality", f"{metrics['Quality_Score_mean'].mean():.2f}/5", "across all tasks"),
-            ("Avg energy", f"{metrics['Energy_kWh_mean'].mean():.2f} kWh", "per task"),
-            ("Avg CO₂", f"{metrics['CO2_kg_mean'].mean():.2f} kg", "per task"),
-        ]
-        r1c1, r1c2 = st.columns(2)
-        r2c1, r2c2 = st.columns(2)
-        for col, (label, value, meta) in zip([r1c1, r1c2, r2c1, r2c2], stats):
-            with col:
-                st.markdown(
-                    f"""
-                    <div class="stat">
-                        <div class="stat-label">{label}</div>
-                        <div class="stat-value">{value}</div>
-                        <div class="stat-meta">{meta}</div>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+            <div class="pill-row">
+                <span class="pill">Sustainability Matrix</span>
+                <span class="pill">Normalized Multi-Metric Score</span>
+                <span class="pill">CO₂-Aware Recommendations</span>
+                <span class="pill">Extensible Schema</span>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    stats = [
+        ("Models", f"{metrics['Model'].nunique()}", "in current dataset"),
+        ("Avg quality", f"{metrics['Quality_Score_mean'].mean():.2f}/5", "across all tasks"),
+        ("Avg energy", f"{metrics['Energy_kWh_mean'].mean():.2f} kWh", "per task"),
+        ("Avg CO₂", f"{metrics['CO2_kg_mean'].mean():.2f} kg", "per task"),
+    ]
+    cols = st.columns(4)
+    for col, (label, value, meta) in zip(cols, stats):
+        with col:
+            st.markdown(
+                f"""
+                <div class="stat">
+                    <div class="stat-label">{label}</div>
+                    <div class="stat-value">{value}</div>
+                    <div class="stat-meta">{meta}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+
+def section_heading(title: str, desc: str) -> None:
+    st.markdown(f'<p class="section-title">{title}</p><p class="section-desc">{desc}</p>', unsafe_allow_html=True)
 
 
 def size_badge_class(size: str) -> str:
@@ -471,7 +512,7 @@ def build_energy_bar(metrics: pd.DataFrame) -> go.Figure:
         labels={"Energy_kWh_mean": "kWh per task", "Model": ""},
         title="Energy footprint by model",
     )
-    fig.update_layout(height=320, template="plotly_white", margin=dict(l=20, r=20, t=50, b=20), showlegend=False)
+    fig.update_layout(height=360, template="plotly_white", margin=dict(l=100, r=40, t=50, b=36), showlegend=False)
     fig.update_traces(textposition="outside")
     return fig
 
@@ -489,7 +530,7 @@ def build_latency_bar(metrics: pd.DataFrame) -> go.Figure:
         labels={"Latency_sec_mean": "seconds per task", "Model": ""},
         title="Latency by model",
     )
-    fig.update_layout(height=320, template="plotly_white", margin=dict(l=20, r=20, t=50, b=20), showlegend=False)
+    fig.update_layout(height=360, template="plotly_white", margin=dict(l=100, r=40, t=50, b=36), showlegend=False)
     fig.update_traces(textposition="outside")
     return fig
 
@@ -527,37 +568,47 @@ def metric_card(label: str, value: str, help_text: str) -> None:
     )
 
 
-def build_matrix(metrics: pd.DataFrame) -> go.Figure:
+def build_matrix(metrics: pd.DataFrame, *, compact: bool = False) -> go.Figure:
+    size_ref = metrics["Latency_sec_mean"].clip(lower=8) * 2.2 + 28
     fig = px.scatter(
         metrics,
         x="Energy_kWh_mean",
         y="Quality_Score_mean",
-        size="Latency_sec_mean",
+        size=size_ref,
         color="Model_Size",
-        text="Model",
         color_discrete_map=SIZE_COLORS,
+        hover_name="Model",
         hover_data={
+            "Model": False,
             "Sustainability_Score": ":.2f",
-            "Energy_kWh_mean": ":.3f",
-            "CO2_kg_mean": ":.3f",
-            "Latency_sec_mean": ":.2f",
+            "Energy_kWh_mean": ":.2f",
+            "CO2_kg_mean": ":.2f",
+            "Latency_sec_mean": ":.1f",
             "Cost_EUR_mean": ":.4f",
         },
         labels={
             "Energy_kWh_mean": "Mean energy per task (kWh)",
-            "Quality_Score_mean": "Mean quality score (1-5)",
+            "Quality_Score_mean": "Mean quality score (1–5)",
             "Model_Size": "Size class",
         },
-        title="Sustainability Matrix: quality vs footprint",
+        title="Sustainability Matrix",
     )
-    fig.update_traces(textposition="top center", marker=dict(line=dict(width=1, color="white"), opacity=0.82))
-    fig.add_vline(x=metrics["Energy_kWh_mean"].median(), line_dash="dash", line_color="#94a3b8")
-    fig.add_hline(y=metrics["Quality_Score_mean"].median(), line_dash="dash", line_color="#94a3b8")
+    fig.update_traces(
+        mode="markers",
+        marker=dict(line=dict(width=1.4, color="white"), opacity=0.85, sizemode="diameter"),
+    )
+    x_max = max(float(metrics["Energy_kWh_mean"].max()) * 1.12, 5.0)
+    y_min = float(metrics["Quality_Score_mean"].min()) - 0.12
+    y_max = float(metrics["Quality_Score_mean"].max()) + 0.08
+    fig.add_vline(x=float(metrics["Energy_kWh_mean"].median()), line_dash="dash", line_color="#cbd5e1")
+    fig.add_hline(y=float(metrics["Quality_Score_mean"].median()), line_dash="dash", line_color="#cbd5e1")
     fig.update_layout(
-        height=560,
+        height=480 if compact else 560,
         template="plotly_white",
-        legend_title_text="Model size",
-        margin=dict(l=20, r=20, t=70, b=20),
+        legend=dict(title="Size class", orientation="h", yanchor="bottom", y=1.02, x=0),
+        margin=dict(l=40, r=30, t=60, b=40),
+        xaxis=dict(range=[-0.5, x_max]),
+        yaxis=dict(range=[y_min, y_max]),
     )
     return fig
 
@@ -669,21 +720,28 @@ def main() -> None:
         source_message = "Using reproducible synthetic demonstration data"
 
     st.sidebar.title("Filters")
-    st.sidebar.caption(source_message)
-    st.sidebar.markdown(f"[Open static HTML version]({PAGES_URL})")
+    with st.sidebar.expander("Filter models & tasks", expanded=True):
+        st.caption(source_message)
+        available_sizes = [size for size in SIZE_ORDER if size in set(base_metrics["Model_Size"].astype(str))]
+        selected_sizes = st.multiselect("Model size", available_sizes, default=available_sizes, key="filter_size")
+        available_models = sorted(
+            base_metrics.loc[base_metrics["Model_Size"].astype(str).isin(selected_sizes), "Model"]
+            .map(clean_model_name)
+            .unique()
+        )
+        selected_models = st.multiselect("Models", available_models, default=available_models, key="filter_models")
 
-    available_sizes = [size for size in SIZE_ORDER if size in set(base_metrics["Model_Size"].astype(str))]
-    selected_sizes = st.sidebar.multiselect("Model size", available_sizes, default=available_sizes)
-    available_models = sorted(
-        base_metrics.loc[base_metrics["Model_Size"].astype(str).isin(selected_sizes), "Model"]
-        .map(clean_model_name)
-        .unique()
-    )
-    selected_models = st.sidebar.multiselect("Models", available_models, default=available_models)
+        if raw_df is not None and "Task_Category" in raw_df.columns:
+            available_categories = sorted(raw_df["Task_Category"].dropna().astype(str).unique())
+            selected_categories = st.multiselect(
+                "Task categories", available_categories, default=available_categories, key="filter_categories"
+            )
+        else:
+            selected_categories = None
 
-    if raw_df is not None and "Task_Category" in raw_df.columns:
-        available_categories = sorted(raw_df["Task_Category"].dropna().astype(str).unique())
-        selected_categories = st.sidebar.multiselect("Task categories", available_categories, default=available_categories)
+    st.sidebar.link_button("Open paper-style HTML demo", PAGES_URL, use_container_width=True)
+
+    if raw_df is not None and selected_categories is not None:
         filtered_raw = raw_df[
             raw_df["Model"].map(clean_model_name).isin(selected_models)
             & raw_df["Model_Size"].astype(str).isin(selected_sizes)
@@ -711,20 +769,26 @@ def main() -> None:
     tabs = st.tabs(["Overview", "Sustainability Matrix", "Insights", "Recommendations", "Data & Extensibility"])
 
     with tabs[0]:
-        left, right = st.columns([1.6, 1])
-        with left:
-            st.markdown('<div class="panel-card"><h3>Sustainability Matrix</h3><div class="panel-desc">Quality vs energy with latency as marker size and size class as colour.</div></div>', unsafe_allow_html=True)
-            st.plotly_chart(build_matrix(metrics), width="stretch", key="overview_matrix")
-        with right:
-            render_top_model_card(metrics.iloc[0])
-        c1, c2 = st.columns(2)
+        section_heading(
+            "Sustainability Matrix",
+            "Quality vs energy with latency as marker size and size class as colour. Hover a point for model details.",
+        )
+        st.plotly_chart(build_matrix(metrics), width="stretch", key="overview_matrix")
+        c1, c2, c3 = st.columns([1, 1.2, 1.2])
         with c1:
-            st.plotly_chart(build_energy_bar(metrics), width="stretch", key="overview_energy")
+            render_top_model_card(metrics.iloc[0])
         with c2:
+            section_heading("Energy footprint", "Lower bars are greener choices.")
+            st.plotly_chart(build_energy_bar(metrics), width="stretch", key="overview_energy")
+        with c3:
+            section_heading("Latency", "Mean seconds per task.")
             st.plotly_chart(build_latency_bar(metrics), width="stretch", key="overview_latency")
 
     with tabs[1]:
-        st.markdown('<div class="control-bar"><strong>Composite score weights</strong> — adjust and re-rank models</div>', unsafe_allow_html=True)
+        section_heading(
+            "Adjust weights",
+            "Slide to change how quality, energy, speed, and cost contribute to the composite score.",
+        )
         w1, w2, w3, w4 = st.columns(4)
         with w1:
             weight_quality = st.slider("Quality", 0.0, 1.0, 0.40, 0.05, key="weight_quality")

@@ -41,8 +41,6 @@ ENV/
 Thumbs.db
 
 # Streamlit
-.streamlit/
-
-# API Keys and secrets
-*.key
+.streamlit/*
+!.streamlit/config.toml
 secrets.toml
