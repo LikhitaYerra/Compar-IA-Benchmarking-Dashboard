@@ -569,17 +569,23 @@ def metric_card(label: str, value: str, help_text: str) -> None:
 
 
 def build_matrix(metrics: pd.DataFrame, *, compact: bool = False) -> go.Figure:
-    size_ref = metrics["Latency_sec_mean"].clip(lower=8) * 2.2 + 28
+    plot_df = metrics.copy()
+    # Match HTML dashboard: modest pixel sizes (~14–32), not raw latency as diameter.
+    plot_df["_marker_size"] = plot_df["Latency_sec_mean"].apply(
+        lambda v: float(np.clip(v * 1.15 + 8, 14, 32))
+    )
     fig = px.scatter(
-        metrics,
+        plot_df,
         x="Energy_kWh_mean",
         y="Quality_Score_mean",
-        size=size_ref,
+        size="_marker_size",
+        size_max=28,
         color="Model_Size",
         color_discrete_map=SIZE_COLORS,
         hover_name="Model",
         hover_data={
             "Model": False,
+            "_marker_size": False,
             "Sustainability_Score": ":.2f",
             "Energy_kWh_mean": ":.2f",
             "CO2_kg_mean": ":.2f",
@@ -595,11 +601,11 @@ def build_matrix(metrics: pd.DataFrame, *, compact: bool = False) -> go.Figure:
     )
     fig.update_traces(
         mode="markers",
-        marker=dict(line=dict(width=1.4, color="white"), opacity=0.85, sizemode="diameter"),
+        marker=dict(line=dict(width=1.4, color="white"), opacity=0.85),
     )
-    x_max = max(float(metrics["Energy_kWh_mean"].max()) * 1.12, 5.0)
-    y_min = float(metrics["Quality_Score_mean"].min()) - 0.12
-    y_max = float(metrics["Quality_Score_mean"].max()) + 0.08
+    x_max = max(float(metrics["Energy_kWh_mean"].max()) * 1.15, 5.0)
+    y_min = float(metrics["Quality_Score_mean"].min()) - 0.15
+    y_max = float(metrics["Quality_Score_mean"].max()) + 0.10
     fig.add_vline(x=float(metrics["Energy_kWh_mean"].median()), line_dash="dash", line_color="#cbd5e1")
     fig.add_hline(y=float(metrics["Quality_Score_mean"].median()), line_dash="dash", line_color="#cbd5e1")
     fig.update_layout(
