@@ -28,7 +28,7 @@
     body {
       font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #050a17 0, #050a17 220px, #f1f5f9 220px, #f1f5f9 100%);
+      background: #f1f5f9;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }
@@ -80,8 +80,17 @@
     }
     .container { max-width: 1280px; margin: 0 auto; padding: 24px 28px 80px 28px; }
     .hero {
-      color: #f8fafc; margin-top: -12px; padding: 32px 0 18px 0;
-      display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px;
+      color: #f8fafc;
+      margin-top: 0;
+      padding: 28px 32px 22px 32px;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 32px;
+      background: linear-gradient(135deg, #0f172a 0%, #111827 55%, #0b1220 100%);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, .14);
+      margin-bottom: 20px;
     }
     .kicker { color: #99f6e4; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .8rem; }
     h1 { font-size: clamp(2.2rem, 4.4vw, 3.5rem); margin: 10px 0 14px; letter-spacing: -.06em; line-height: 1; }
@@ -300,7 +309,7 @@
 </footer>
 
 <script>
-const data = [{"Model": "GPT-OSS 20B", "Model_Size": "Medium", "Quality_Score_mean": 4.667, "Latency_sec_mean": 14.534, "Energy_kWh_mean": 0.955, "CO2_kg_mean": 0.45, "Cost_EUR_mean": 0.0, "QualityEfficiency": 4.8869, "SpeedEfficiency": 0.3211, "QualityNorm": 1.0, "EnergyEffNorm": 1.0, "SpeedEffNorm": 0.9154, "LowEnergyNorm": 1.0, "LowCO2Norm": 1.0, "LowLatencyNorm": 0.9078, "FootprintIndex": 1.0, "SustainabilityScore": 0.9801, "Rank": 1}, {"Model": "LLaMA 3.1 8B", "Model_Size": "Small", "Quality_Score_mean": 4.567, "Latency_sec_mean": 13.725, "Energy_kWh_mean": 1.575, "CO2_kg_mean": 0.963, "Cost_EUR_mean": 0.0, "QualityEfficiency": 2.8997, "SpeedEfficiency": 0.3328, "QualityNorm": 0.8333, "EnergyEffNorm": 0.5841, "SpeedEffNorm": 0.9838, "LowEnergyNorm": 0.983, "LowCO2Norm": 0.9782, "LowLatencyNorm": 0.9807, "FootprintIndex": 0.9809, "SustainabilityScore": 0.7954, "Rank": 2}, {"Model": "Gemma 8B", "Model_Size": "Small", "Quality_Score_mean": 4.533, "Latency_sec_mean": 13.511, "Energy_kWh_mean": 1.837, "CO2_kg_mean": 1.113, "Cost_EUR_mean": 0.0, "QualityEfficiency": 2.4676, "SpeedEfficiency": 0.3355, "QualityNorm": 0.7767, "EnergyEffNorm": 0.4937, "SpeedEffNorm": 1.0, "LowEnergyNorm": 0.9759, "LowCO2Norm": 0.9719, "LowLatencyNorm": 1.0, "FootprintIndex": 0.9741, "SustainabilityScore": 0.746, "Rank": 3}, {"Model": "Mistral Small", "Model_Size": "Medium", "Quality_Score_mean": 4.333, "Latency_sec_mean": 14.179, "Energy_kWh_mean": 2.708, "CO2_kg_mean": 1.663, "Cost_EUR_mean": 0.0, "QualityEfficiency": 1.6001, "SpeedEfficiency": 0.3056, "QualityNorm": 0.4433, "EnergyEffNorm": 0.3122, "SpeedEffNorm": 0.8243, "LowEnergyNorm": 0.9521, "LowCO2Norm": 0.9486, "LowLatencyNorm": 0.9398, "FootprintIndex": 0.9505, "SustainabilityScore": 0.4944, "Rank": 4}, {"Model": "GPT-5", "Model_Size": "Large", "Quality_Score_mean": 4.533, "Latency_sec_mean": 24.443, "Energy_kWh_mean": 22.5, "CO2_kg_mean": 14.4, "Cost_EUR_mean": 0.0, "QualityEfficiency": 0.2015, "SpeedEfficiency": 0.1855, "QualityNorm": 0.7767, "EnergyEffNorm": 0.0195, "SpeedEffNorm": 0.1186, "LowEnergyNorm": 0.411, "LowCO2Norm": 0.4085, "LowLatencyNorm": 0.015, "FootprintIndex": 0.4099, "SustainabilityScore": 0.3991, "Rank": 5}, {"Model": "DeepSeek R1", "Model_Size": "Large", "Quality_Score_mean": 4.067, "Latency_sec_mean": 24.61, "Energy_kWh_mean": 37.533, "CO2_kg_mean": 24.033, "Cost_EUR_mean": 0.0, "QualityEfficiency": 0.1084, "SpeedEfficiency": 0.1653, "QualityNorm": 0.0, "EnergyEffNorm": 0.0, "SpeedEffNorm": 0.0, "LowEnergyNorm": 0.0, "LowCO2Norm": 0.0, "LowLatencyNorm": 0.0, "FootprintIndex": 0.0, "SustainabilityScore": 0.0, "Rank": 6}];
+const data = [{"Model":"GPT-OSS 20B","Model_Size":"Medium","Quality_Score_mean":4.667,"Latency_sec_mean":14.534,"Energy_kWh_mean":0.955,"CO2_kg_mean":0.45,"Cost_EUR_mean":0.0,"QualityEfficiency":4.8869,"SpeedEfficiency":0.3211,"QualityNorm":1.0,"EnergyEffNorm":1.0,"SpeedEffNorm":0.9154,"LowEnergyNorm":1.0,"LowCO2Norm":1.0,"LowLatencyNorm":0.9078,"FootprintIndex":1.0,"SustainabilityScore":0.9081,"Rank":1},{"Model":"LLaMA 3.1 8B","Model_Size":"Small","Quality_Score_mean":4.567,"Latency_sec_mean":13.725,"Energy_kWh_mean":1.575,"CO2_kg_mean":0.963,"Cost_EUR_mean":0.0,"QualityEfficiency":2.8997,"SpeedEfficiency":0.3328,"QualityNorm":0.8333,"EnergyEffNorm":0.5841,"SpeedEffNorm":0.9838,"LowEnergyNorm":0.983,"LowCO2Norm":0.9782,"LowLatencyNorm":0.9807,"FootprintIndex":0.9809,"SustainabilityScore":0.7511,"Rank":2},{"Model":"Gemma 8B","Model_Size":"Small","Quality_Score_mean":4.533,"Latency_sec_mean":13.511,"Energy_kWh_mean":1.837,"CO2_kg_mean":1.113,"Cost_EUR_mean":0.0,"QualityEfficiency":2.4676,"SpeedEfficiency":0.3355,"QualityNorm":0.7767,"EnergyEffNorm":0.4937,"SpeedEffNorm":1.0,"LowEnergyNorm":0.9759,"LowCO2Norm":0.9719,"LowLatencyNorm":1.0,"FootprintIndex":0.9741,"SustainabilityScore":0.7091,"Rank":3},{"Model":"Mistral Small","Model_Size":"Medium","Quality_Score_mean":4.333,"Latency_sec_mean":14.179,"Energy_kWh_mean":2.708,"CO2_kg_mean":1.663,"Cost_EUR_mean":0.0,"QualityEfficiency":1.6001,"SpeedEfficiency":0.3056,"QualityNorm":0.4433,"EnergyEffNorm":0.3122,"SpeedEffNorm":0.8243,"LowEnergyNorm":0.9521,"LowCO2Norm":0.9486,"LowLatencyNorm":0.9398,"FootprintIndex":0.9505,"SustainabilityScore":0.4952,"Rank":4},{"Model":"GPT-5","Model_Size":"Large","Quality_Score_mean":4.533,"Latency_sec_mean":24.443,"Energy_kWh_mean":22.5,"CO2_kg_mean":14.4,"Cost_EUR_mean":0.0,"QualityEfficiency":0.2015,"SpeedEfficiency":0.1855,"QualityNorm":0.7767,"EnergyEffNorm":0.0195,"SpeedEffNorm":0.1186,"LowEnergyNorm":0.411,"LowCO2Norm":0.4085,"LowLatencyNorm":0.015,"FootprintIndex":0.4099,"SustainabilityScore":0.4143,"Rank":5},{"Model":"DeepSeek R1","Model_Size":"Large","Quality_Score_mean":4.067,"Latency_sec_mean":24.61,"Energy_kWh_mean":37.533,"CO2_kg_mean":24.033,"Cost_EUR_mean":0.0,"QualityEfficiency":0.1084,"SpeedEfficiency":0.1653,"QualityNorm":0.0,"EnergyEffNorm":0.0,"SpeedEffNorm":0.0,"LowEnergyNorm":0.0,"LowCO2Norm":0.0,"LowLatencyNorm":0.0,"FootprintIndex":0.0,"SustainabilityScore":0.075,"Rank":6}];
 const sizeColors = { Small: '#10b981', Medium: '#38bdf8', Large: '#f43f5e' };
 
 function fmtNumber(value, digits = 2) {
@@ -347,7 +356,7 @@ function buildMatrix(targetId, records) {
       type:'scatter', mode:'markers+text', name: size,
       x: g.map(d=>d.Energy_kWh_mean), y: g.map(d=>d.Quality_Score_mean),
       text: g.map(d=>d.Model), textposition: 'top center',
-      marker: { size: g.map(d=>Math.max(14, d.Latency_sec_mean*1.55)), color: sizeColors[size], opacity: .82, line: { color: 'white', width: 1.4 } },
+      marker: { size: g.map(d=>Math.min(24, Math.max(14, d.Latency_sec_mean*1.15+8))), color: sizeColors[size], opacity: .82, line: { color: 'white', width: 1.4 } },
       hovertemplate: '<b>%{text}</b><br>Quality: %{y:.2f}<br>Energy: %{x:.2f} kWh<br>Latency: %{customdata.lat:.1f}s<br>Score: %{customdata.score:.2f}<extra></extra>',
       customdata: g.map(d=>({ lat: d.Latency_sec_mean, score: d.SustainabilityScore }))
     };

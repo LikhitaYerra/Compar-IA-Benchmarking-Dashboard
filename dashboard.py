@@ -40,10 +40,10 @@ def configure_page() -> None:
                 font-family: 'Inter', system-ui, sans-serif;
             }
             .stApp {
-                background: linear-gradient(180deg, #050a17 0, #050a17 180px, #f1f5f9 180px, #f1f5f9 100%);
+                background: #f1f5f9;
             }
             header[data-testid="stHeader"] {
-                background: rgba(5, 10, 23, 0.92);
+                background: transparent;
             }
             .block-container {
                 padding-top: 0.5rem;
@@ -118,7 +118,23 @@ def configure_page() -> None:
                 color: #0b1220; font-weight: 900; font-size: 0.72rem;
             }
             .comparia-brand { font-weight: 800; letter-spacing: -.04em; font-size: 1.1rem; }
-            .hero-wrap { color: #f8fafc; padding: 8px 0 20px 0; }
+            .hero-panel {
+                background: linear-gradient(135deg, #0f172a 0%, #111827 55%, #0b1220 100%);
+                border: 1px solid rgba(148,163,184,.18);
+                border-radius: 24px;
+                padding: 28px 32px 22px 32px;
+                margin-bottom: 20px;
+                box-shadow: 0 24px 60px rgba(15, 23, 42, .14);
+            }
+            .hero-wrap { color: #f8fafc; padding: 0 0 18px 0; }
+            .stat-grid {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 12px;
+            }
+            @media (max-width: 900px) {
+                .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
             .hero-kicker {
                 color: #99f6e4; font-weight: 700; letter-spacing: .14em;
                 text-transform: uppercase; font-size: .78rem;
@@ -403,44 +419,44 @@ def render_topbar() -> None:
 
 
 def render_hero(metrics: pd.DataFrame) -> None:
-    st.markdown(
-        """
-        <div class="hero-wrap">
-            <div class="hero-kicker">Sustainability-Aware LLM Benchmarking</div>
-            <div class="hero-title">Choose LLMs that balance quality with energy, CO₂, latency and cost.</div>
-            <div class="hero-copy">
-                Compar'IA replaces accuracy-only leaderboards with an interactive interface that links
-                task quality to operational and environmental footprint.
-            </div>
-            <div class="pill-row">
-                <span class="pill">Sustainability Matrix</span>
-                <span class="pill">Normalized Multi-Metric Score</span>
-                <span class="pill">CO₂-Aware Recommendations</span>
-                <span class="pill">Extensible Schema</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
     stats = [
         ("Models", f"{metrics['Model'].nunique()}", "in current dataset"),
         ("Avg quality", f"{metrics['Quality_Score_mean'].mean():.2f}/5", "across all tasks"),
         ("Avg energy", f"{metrics['Energy_kWh_mean'].mean():.2f} kWh", "per task"),
         ("Avg CO₂", f"{metrics['CO2_kg_mean'].mean():.2f} kg", "per task"),
     ]
-    cols = st.columns(4)
-    for col, (label, value, meta) in zip(cols, stats):
-        with col:
-            st.markdown(
-                f"""
-                <div class="stat">
-                    <div class="stat-label">{label}</div>
-                    <div class="stat-value">{value}</div>
-                    <div class="stat-meta">{meta}</div>
+    stat_html = "".join(
+        f"""
+        <div class="stat">
+            <div class="stat-label">{label}</div>
+            <div class="stat-value">{value}</div>
+            <div class="stat-meta">{meta}</div>
+        </div>
+        """
+        for label, value, meta in stats
+    )
+    st.markdown(
+        f"""
+        <div class="hero-panel">
+            <div class="hero-wrap">
+                <div class="hero-kicker">Sustainability-Aware LLM Benchmarking</div>
+                <div class="hero-title">Choose LLMs that balance quality with energy, CO₂, latency and cost.</div>
+                <div class="hero-copy">
+                    Compar'IA replaces accuracy-only leaderboards with an interactive interface that links
+                    task quality to operational and environmental footprint.
                 </div>
-                """,
-                unsafe_allow_html=True,
-            )
+                <div class="pill-row">
+                    <span class="pill">Sustainability Matrix</span>
+                    <span class="pill">Normalized Multi-Metric Score</span>
+                    <span class="pill">CO₂-Aware Recommendations</span>
+                    <span class="pill">Extensible Schema</span>
+                </div>
+            </div>
+            <div class="stat-grid">{stat_html}</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def section_heading(title: str, desc: str) -> None:
@@ -543,39 +559,43 @@ def metric_card(label: str, value: str, help_text: str) -> None:
 
 def build_matrix(metrics: pd.DataFrame, *, compact: bool = False) -> go.Figure:
     plot_df = metrics.copy()
-    # Match HTML dashboard: modest pixel sizes (~14–32), not raw latency as diameter.
-    plot_df["_marker_size"] = plot_df["Latency_sec_mean"].apply(
-        lambda v: float(np.clip(v * 1.15 + 8, 14, 32))
-    )
-    fig = px.scatter(
-        plot_df,
-        x="Energy_kWh_mean",
-        y="Quality_Score_mean",
-        size="_marker_size",
-        size_max=28,
-        color="Model_Size",
-        color_discrete_map=SIZE_COLORS,
-        hover_name="Model",
-        hover_data={
-            "Model": False,
-            "_marker_size": False,
-            "Sustainability_Score": ":.2f",
-            "Energy_kWh_mean": ":.2f",
-            "CO2_kg_mean": ":.2f",
-            "Latency_sec_mean": ":.1f",
-            "Cost_EUR_mean": ":.4f",
-        },
-        labels={
-            "Energy_kWh_mean": "Mean energy per task (kWh)",
-            "Quality_Score_mean": "Mean quality score (1–5)",
-            "Model_Size": "Size class",
-        },
-        title="Sustainability Matrix",
-    )
-    fig.update_traces(
-        mode="markers",
-        marker=dict(line=dict(width=1.4, color="white"), opacity=0.85),
-    )
+    marker_sizes = np.clip(plot_df["Latency_sec_mean"].to_numpy(dtype=float) * 1.15 + 8, 14, 24)
+    fig = go.Figure()
+    for size_class in SIZE_ORDER:
+        mask = plot_df["Model_Size"].astype(str) == size_class
+        if not mask.any():
+            continue
+        subset = plot_df.loc[mask]
+        fig.add_trace(
+            go.Scatter(
+                x=subset["Energy_kWh_mean"],
+                y=subset["Quality_Score_mean"],
+                mode="markers",
+                name=size_class,
+                text=subset["Model"],
+                marker=dict(
+                    size=marker_sizes[mask.to_numpy()],
+                    color=SIZE_COLORS[size_class],
+                    line=dict(width=1.4, color="white"),
+                    opacity=0.85,
+                ),
+                customdata=np.column_stack(
+                    [
+                        subset["Sustainability_Score"],
+                        subset["CO2_kg_mean"],
+                        subset["Latency_sec_mean"],
+                    ]
+                ),
+                hovertemplate=(
+                    "<b>%{text}</b><br>"
+                    "Quality: %{y:.2f}<br>"
+                    "Energy: %{x:.2f} kWh<br>"
+                    "CO₂: %{customdata[1]:.2f} kg<br>"
+                    "Latency: %{customdata[2]:.1f}s<br>"
+                    "Score: %{customdata[0]:.2f}<extra></extra>"
+                ),
+            )
+        )
     x_max = max(float(metrics["Energy_kWh_mean"].max()) * 1.15, 5.0)
     y_min = float(metrics["Quality_Score_mean"].min()) - 0.15
     y_max = float(metrics["Quality_Score_mean"].max()) + 0.10
@@ -584,10 +604,11 @@ def build_matrix(metrics: pd.DataFrame, *, compact: bool = False) -> go.Figure:
     fig.update_layout(
         height=480 if compact else 560,
         template="plotly_white",
+        title="Sustainability Matrix",
         legend=dict(title="Size class", orientation="h", yanchor="bottom", y=1.02, x=0),
         margin=dict(l=40, r=30, t=60, b=40),
-        xaxis=dict(range=[-0.5, x_max]),
-        yaxis=dict(range=[y_min, y_max]),
+        xaxis=dict(title="Mean energy per task (kWh)", range=[-0.5, x_max]),
+        yaxis=dict(title="Mean quality score (1–5)", range=[y_min, y_max]),
     )
     return fig
 
