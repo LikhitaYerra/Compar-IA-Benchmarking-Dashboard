@@ -27,38 +27,18 @@ A comprehensive Streamlit dashboard for LLM benchmarking with Mistral AI integra
    ```bash
    streamlit run streamlit_app.py
    ```
+   Or directly:
+   ```bash
+   streamlit run dashboard.py
+   ```
 
 ## Streamlit Cloud Deployment
 
-This app is configured for Streamlit Cloud deployment. The main entry point is `streamlit_app.py`.
+This app is configured for Streamlit Cloud deployment. The entry point is `streamlit_app.py`, which loads the main Compar'IA dashboard from `dashboard.py`.
 
-### Environment Variables
+No API keys are required. The app reads bundled CSV data (`comparai_metrics_detailed.csv`) and works fully offline.
 
-- `MISTRAL_API_KEY`: Your Mistral AI API key (optional, will show offline mode if not provided)
-
-### Setting up Environment Variables
-
-1. **For Local Development:**
-   ```bash
-   # Copy the example file
-   cp env.example .env
-   
-   # Edit .env and add your API key
-   MISTRAL_API_KEY=your_actual_api_key_here
-   ```
-
-2. **For Streamlit Cloud:**
-   - Go to your app settings in Streamlit Cloud
-   - Add the environment variable `MISTRAL_API_KEY` with your API key value
-   - Redeploy your app
-
-### Getting a Mistral API Key
-
-1. Visit [Mistral AI Console](https://console.mistral.ai/)
-2. Sign up or log in to your account
-3. Navigate to API Keys section
-4. Create a new API key
-5. Copy the key and add it to your environment variables
+After pushing changes to GitHub, open your app on Streamlit Cloud and click **Reboot app** (or wait for automatic redeploy).
 
 ## Data Format
 
