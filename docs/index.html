@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Compar'IA · Sustainable LLM Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <style>
+    :root {
+      --bg: #050a17;
+      --bg-soft: #0b1220;
+      --panel: #ffffff;
+      --panel-2: #f8fafc;
+      --line: #e5e7eb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #10b981;
+      --accent-2: #38bdf8;
+      --warn: #fb923c;
+      --danger: #ef4444;
+      --shadow: 0 18px 45px rgba(15, 23, 42, .08);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin:0; padding:0; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #050a17 0, #050a17 220px, #f1f5f9 220px, #f1f5f9 100%);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(5, 10, 23, .92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid rgba(148,163,184,.18);
+    }
+    .nav {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center; gap: 18px;
+      padding: 14px 28px;
+      color: #e2e8f0;
+    }
+    .brand {
+      font-weight: 800; letter-spacing: -.04em; font-size: 1.18rem;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .brand-mark {
+      width: 30px; height: 30px; border-radius: 9px;
+      background: conic-gradient(from 220deg, #10b981, #38bdf8, #818cf8, #10b981);
+      display: grid; place-items: center; color: #0b1220; font-weight: 900;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, .35);
+    }
+    nav.tabs {
+      display: flex; gap: 6px; flex: 1; flex-wrap: wrap;
+    }
+    nav.tabs button {
+      background: transparent; color: #cbd5e1;
+      border: 1px solid transparent;
+      padding: 8px 14px; border-radius: 999px;
+      cursor: pointer; font-weight: 600; font-size: .9rem;
+      transition: all .15s ease;
+    }
+    nav.tabs button:hover { background: rgba(148,163,184,.12); color: #fff; }
+    nav.tabs button.active { background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.45); color: #d1fae5; }
+    .nav .actions { display: flex; gap: 10px; }
+    .nav button.primary {
+      background: var(--accent); color: #062b1f; border: none;
+      padding: 9px 16px; border-radius: 12px;
+      font-weight: 700; cursor: pointer;
+      box-shadow: 0 12px 24px rgba(16,185,129,.32);
+    }
+    .nav button.ghost {
+      background: transparent; color: #e2e8f0;
+      border: 1px solid rgba(148,163,184,.32);
+      padding: 9px 14px; border-radius: 12px; cursor: pointer; font-weight: 600;
+    }
+    .container { max-width: 1280px; margin: 0 auto; padding: 24px 28px 80px 28px; }
+    .hero {
+      color: #f8fafc; margin-top: -12px; padding: 32px 0 18px 0;
+      display: grid; grid-template-columns: 1.4fr 1fr; gap: 32px;
+    }
+    .kicker { color: #99f6e4; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: .8rem; }
+    h1 { font-size: clamp(2.2rem, 4.4vw, 3.5rem); margin: 10px 0 14px; letter-spacing: -.06em; line-height: 1; }
+    .hero p { color: #cbd5e1; max-width: 640px; font-size: 1.04rem; }
+    .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .pill { font-size: .8rem; padding: 6px 12px; border-radius: 999px; border: 1px solid rgba(16,185,129,.45); color: #d1fae5; background: rgba(16,185,129,.12); font-weight: 600; }
+    .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; align-self: end; }
+    .stat { background: rgba(15,23,42,.6); border: 1px solid rgba(148,163,184,.22); border-radius: 18px; padding: 16px; color: #e2e8f0; }
+    .stat .label { color: #94a3b8; text-transform: uppercase; font-size: .72rem; letter-spacing: .12em; font-weight: 700; }
+    .stat .value { font-size: 1.7rem; font-weight: 800; letter-spacing: -.04em; margin-top: 4px; }
+    .stat .meta { color: #94a3b8; font-size: .85rem; }
+
+    main.view { display: none; }
+    main.view.active { display: block; animation: fadeIn .25s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px; }
+    .card {
+      background: var(--panel); border: 1px solid var(--line); border-radius: 22px;
+      padding: 22px; box-shadow: var(--shadow);
+    }
+    .card h2 { margin: 0 0 4px; font-size: 1.1rem; letter-spacing: -.02em; }
+    .card .desc { color: var(--muted); font-size: .9rem; margin-bottom: 14px; }
+    .span4 { grid-column: span 4; }
+    .span6 { grid-column: span 6; }
+    .span7 { grid-column: span 7; }
+    .span5 { grid-column: span 5; }
+    .span8 { grid-column: span 8; }
+    .span12 { grid-column: span 12; }
+
+    .badge { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; font-size: .76rem; font-weight: 700; }
+    .badge.green { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+    .badge.blue  { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .badge.red   { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+    table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; }
+    th { background: var(--panel-2); color: #334155; font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; }
+    tr:hover td { background: #f8fafc; }
+
+    .control-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-bottom: 18px; padding: 16px 20px; background: white; border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
+    .control-bar label { font-size: .82rem; color: var(--muted); font-weight: 600; }
+    .control-bar input[type=range] { accent-color: var(--accent); }
+    .control-bar .group { display: flex; align-items: center; gap: 8px; }
+
+    .recs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .rec {
+      padding: 18px 20px; border-radius: 18px; border: 1px solid #d1fae5;
+      background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%);
+    }
+    .rec.alt { background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%); border-color: #bae6fd; }
+    .rec.alt2 { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fcd34d; }
+    .rec.alt3 { background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%); border-color: #f5d0fe; }
+    .rec h4 { margin: 0; font-size: 1rem; letter-spacing: -.01em; }
+    .rec p { margin: 6px 0 0; color: #334155; font-size: .9rem; }
+    .rec .figures { display: flex; gap: 18px; margin-top: 10px; font-size: .85rem; color: var(--muted); }
+    .rec .figures b { color: #0f172a; }
+
+    footer { color: var(--muted); padding: 30px 28px; max-width: 1280px; margin: 0 auto; font-size: .85rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+
+    @media (max-width: 960px) {
+      .hero { grid-template-columns: 1fr; }
+      .span4, .span5, .span6, .span7, .span8, .span12 { grid-column: span 12; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="brand"><div class="brand-mark">IA</div> Compar'IA</div>
+    <nav class="tabs" id="tabBar">
+      <button data-view="overview" class="active">Overview</button>
+      <button data-view="matrix">Sustainability Matrix</button>
+      <button data-view="insights">Insights</button>
+      <button data-view="recs">Recommendations</button>
+      <button data-view="data">Data &amp; Extensibility</button>
+    </nav>
+    <div class="actions">
+      <button class="ghost" id="resetBtn">Reset</button>
+      <button class="primary" id="downloadBtn">Export CSV</button>
+    </div>
+  </div>
+</header>
+
+<section class="container">
+
+  <div class="hero">
+    <div>
+      <span class="kicker">Sustainability-Aware LLM Benchmarking</span>
+      <h1>Choose LLMs that balance quality with energy, CO₂, latency and cost.</h1>
+      <p>Compar'IA replaces accuracy-only leaderboards with an interactive interface that links task quality to operational and environmental footprint. Add a new model by appending one row to the CSV; the dashboard recomputes scores, charts and recommendations.</p>
+      <div class="pills">
+        <span class="pill">Sustainability Matrix</span>
+        <span class="pill">Normalized Multi-Metric Score</span>
+        <span class="pill">CO₂-Aware Recommendations</span>
+        <span class="pill">Extensible Schema</span>
+      </div>
+    </div>
+    <div class="stat-grid" id="statGrid"></div>
+  </div>
+
+  <!-- OVERVIEW VIEW -->
+  <main class="view active" data-view="overview">
+    <div class="grid">
+      <div class="card span8">
+        <h2>Sustainability Matrix</h2>
+        <div class="desc">Quality vs energy, with latency encoded as marker size and size class as colour. The dashed lines are the population medians, splitting models into low- and high-footprint clusters.</div>
+        <div id="miniMatrix" style="height: 380px"></div>
+      </div>
+      <div class="card span4">
+        <h2>Top model overall</h2>
+        <div class="desc">Best balanced choice under the current weights.</div>
+        <div id="topModelCard"></div>
+      </div>
+      <div class="card span6">
+        <h2>Energy footprint by model</h2>
+        <div class="desc">Mean kWh per task; lower bars are greener choices.</div>
+        <div id="energyBar" style="height: 320px"></div>
+      </div>
+      <div class="card span6">
+        <h2>Latency by model</h2>
+        <div class="desc">Mean seconds per task; sorted from most responsive to slowest.</div>
+        <div id="latencyBar" style="height: 320px"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MATRIX VIEW -->
+  <main class="view" data-view="matrix">
+    <div class="control-bar">
+      <div class="group"><label>Quality</label><input id="wQuality" type="range" min="0" max="1" step="0.05" value="0.40"></div>
+      <div class="group"><label>Energy</label><input id="wEnergy" type="range" min="0" max="1" step="0.05" value="0.25"></div>
+      <div class="group"><label>Speed</label><input id="wSpeed" type="range" min="0" max="1" step="0.05" value="0.20"></div>
+      <div class="group"><label>Cost</label><input id="wCost" type="range" min="0" max="1" step="0.05" value="0.15"></div>
+      <span class="badge green" id="weightBadge">balanced sustainability profile</span>
+    </div>
+    <div class="grid">
+      <div class="card span12">
+        <h2>Sustainability matrix</h2>
+        <div class="desc">Quality vs energy with latency as marker size and size class as colour. The chart re-ranks models when you adjust the weights above.</div>
+        <div id="mainMatrix" style="height: 540px"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- INSIGHTS VIEW -->
+  <main class="view" data-view="insights">
+    <div class="grid">
+      <div class="card span6">
+        <h2>Metric contribution heatmap</h2>
+        <div class="desc">Normalized signals reveal why each model receives its sustainability ranking.</div>
+        <div id="heatmap" style="height: 480px"></div>
+      </div>
+      <div class="card span6">
+        <h2>Sustainability signature</h2>
+        <div class="desc">Parallel coordinates show how each LLM performs across the full set of dimensions.</div>
+        <div id="parallel" style="height: 480px"></div>
+      </div>
+      <div class="card span12">
+        <h2>Composite ranking</h2>
+        <div class="desc">Models ordered by sustainability score, lowest at the bottom.</div>
+        <div id="ranking" style="height: 380px"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- RECOMMENDATIONS VIEW -->
+  <main class="view" data-view="recs">
+    <div class="grid">
+      <div class="card span12">
+        <h2>Automatic model recommendations</h2>
+        <div class="desc">Best balanced, lowest energy, fastest, and highest quality models. Cost is included only when non-zero cost data is available.</div>
+        <div class="recs" id="recCards"></div>
+      </div>
+      <div class="card span12">
+        <h2>Why this is novel</h2>
+        <div class="desc">Compar'IA differs from quality-only LLM leaderboards by coupling usefulness with environmental and operational cost.</div>
+        <ul style="color:#334155; font-size:.95rem; line-height:1.55;">
+          <li>One interface for quality, latency, energy, CO₂, and cost.</li>
+          <li>Normalized scoring that excludes invalid or zero denominators instead of producing infinite rankings.</li>
+          <li>Extensible to new LLMs, water usage, regional carbon intensity, or memory footprint as additional CSV columns.</li>
+          <li>Exportable evidence trail for papers, internal procurement, and policy reports.</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <!-- DATA VIEW -->
+  <main class="view" data-view="data">
+    <div class="grid">
+      <div class="card span12">
+        <h2>Benchmark table</h2>
+        <div class="desc">All metrics, sorted by sustainability score. Click on any column header in the source CSV to extend the schema.</div>
+        <div style="overflow-x:auto">
+          <table id="dataTable"></table>
+        </div>
+      </div>
+      <div class="card span12">
+        <h2>Extending the dashboard</h2>
+        <div class="desc">Compar'IA was designed so non-experts can extend it.</div>
+        <ol style="color:#334155; font-size:.95rem; line-height:1.6;">
+          <li>Add a row in <code>data_collection_template.csv</code> for each new model and task.</li>
+          <li>Optionally add new columns for additional sustainability indicators.</li>
+          <li>Reload the dashboard; aggregations, scoring, and recommendations recompute automatically.</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+</section>
+
+<footer>
+  Compar'IA dashboard prototype · prepared for the GREEN-PR workshop submission. Data shown comes from the bundled benchmark snapshot and should be replaced with documented measurements before publication.
+</footer>
+
+<script>
+const data = [{"Model": "GPT-OSS 20B", "Model_Size": "Medium", "Quality_Score_mean": 4.667, "Latency_sec_mean": 14.534, "Energy_kWh_mean": 0.955, "CO2_kg_mean": 0.45, "Cost_EUR_mean": 0.0, "QualityEfficiency": 4.8869, "SpeedEfficiency": 0.3211, "QualityNorm": 1.0, "EnergyEffNorm": 1.0, "SpeedEffNorm": 0.9154, "LowEnergyNorm": 1.0, "LowCO2Norm": 1.0, "LowLatencyNorm": 0.9078, "FootprintIndex": 1.0, "SustainabilityScore": 0.9801, "Rank": 1}, {"Model": "LLaMA 3.1 8B", "Model_Size": "Small", "Quality_Score_mean": 4.567, "Latency_sec_mean": 13.725, "Energy_kWh_mean": 1.575, "CO2_kg_mean": 0.963, "Cost_EUR_mean": 0.0, "QualityEfficiency": 2.8997, "SpeedEfficiency": 0.3328, "QualityNorm": 0.8333, "EnergyEffNorm": 0.5841, "SpeedEffNorm": 0.9838, "LowEnergyNorm": 0.983, "LowCO2Norm": 0.9782, "LowLatencyNorm": 0.9807, "FootprintIndex": 0.9809, "SustainabilityScore": 0.7954, "Rank": 2}, {"Model": "Gemma 8B", "Model_Size": "Small", "Quality_Score_mean": 4.533, "Latency_sec_mean": 13.511, "Energy_kWh_mean": 1.837, "CO2_kg_mean": 1.113, "Cost_EUR_mean": 0.0, "QualityEfficiency": 2.4676, "SpeedEfficiency": 0.3355, "QualityNorm": 0.7767, "EnergyEffNorm": 0.4937, "SpeedEffNorm": 1.0, "LowEnergyNorm": 0.9759, "LowCO2Norm": 0.9719, "LowLatencyNorm": 1.0, "FootprintIndex": 0.9741, "SustainabilityScore": 0.746, "Rank": 3}, {"Model": "Mistral Small", "Model_Size": "Medium", "Quality_Score_mean": 4.333, "Latency_sec_mean": 14.179, "Energy_kWh_mean": 2.708, "CO2_kg_mean": 1.663, "Cost_EUR_mean": 0.0, "QualityEfficiency": 1.6001, "SpeedEfficiency": 0.3056, "QualityNorm": 0.4433, "EnergyEffNorm": 0.3122, "SpeedEffNorm": 0.8243, "LowEnergyNorm": 0.9521, "LowCO2Norm": 0.9486, "LowLatencyNorm": 0.9398, "FootprintIndex": 0.9505, "SustainabilityScore": 0.4944, "Rank": 4}, {"Model": "GPT-5", "Model_Size": "Large", "Quality_Score_mean": 4.533, "Latency_sec_mean": 24.443, "Energy_kWh_mean": 22.5, "CO2_kg_mean": 14.4, "Cost_EUR_mean": 0.0, "QualityEfficiency": 0.2015, "SpeedEfficiency": 0.1855, "QualityNorm": 0.7767, "EnergyEffNorm": 0.0195, "SpeedEffNorm": 0.1186, "LowEnergyNorm": 0.411, "LowCO2Norm": 0.4085, "LowLatencyNorm": 0.015, "FootprintIndex": 0.4099, "SustainabilityScore": 0.3991, "Rank": 5}, {"Model": "DeepSeek R1", "Model_Size": "Large", "Quality_Score_mean": 4.067, "Latency_sec_mean": 24.61, "Energy_kWh_mean": 37.533, "CO2_kg_mean": 24.033, "Cost_EUR_mean": 0.0, "QualityEfficiency": 0.1084, "SpeedEfficiency": 0.1653, "QualityNorm": 0.0, "EnergyEffNorm": 0.0, "SpeedEffNorm": 0.0, "LowEnergyNorm": 0.0, "LowCO2Norm": 0.0, "LowLatencyNorm": 0.0, "FootprintIndex": 0.0, "SustainabilityScore": 0.0, "Rank": 6}];
+const sizeColors = { Small: '#10b981', Medium: '#38bdf8', Large: '#f43f5e' };
+
+function fmtNumber(value, digits = 2) {
+  if (value === null || value === undefined || Number.isNaN(value)) return '-';
+  return Number(value).toFixed(digits);
+}
+
+const tabBar = document.getElementById('tabBar');
+const views = document.querySelectorAll('main.view');
+tabBar.addEventListener('click', e => {
+  const button = e.target.closest('button[data-view]');
+  if (!button) return;
+  tabBar.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === button));
+  views.forEach(v => v.classList.toggle('active', v.dataset.view === button.dataset.view));
+  if (button.dataset.view === 'matrix') Plotly.Plots.resize(document.getElementById('mainMatrix'));
+  if (button.dataset.view === 'insights') {
+    Plotly.Plots.resize(document.getElementById('heatmap'));
+    Plotly.Plots.resize(document.getElementById('parallel'));
+    Plotly.Plots.resize(document.getElementById('ranking'));
+  }
+});
+
+function renderStats(records) {
+  const totals = {
+    models: records.length,
+    quality: records.reduce((s,d)=>s+d.Quality_Score_mean,0)/records.length,
+    energy: records.reduce((s,d)=>s+d.Energy_kWh_mean,0)/records.length,
+    co2: records.reduce((s,d)=>s+d.CO2_kg_mean,0)/records.length,
+  };
+  const grid = document.getElementById('statGrid');
+  grid.innerHTML = `
+    <div class="stat"><div class="label">Models</div><div class="value">${totals.models}</div><div class="meta">in current dataset</div></div>
+    <div class="stat"><div class="label">Avg quality</div><div class="value">${totals.quality.toFixed(2)}/5</div><div class="meta">across all tasks</div></div>
+    <div class="stat"><div class="label">Avg energy</div><div class="value">${totals.energy.toFixed(2)} kWh</div><div class="meta">per task</div></div>
+    <div class="stat"><div class="label">Avg CO₂</div><div class="value">${totals.co2.toFixed(2)} kg</div><div class="meta">per task</div></div>
+  `;
+}
+
+function buildMatrix(targetId, records) {
+  const sizes = [...new Set(records.map(d=>d.Model_Size))];
+  const traces = sizes.map(size => {
+    const g = records.filter(d=>d.Model_Size===size);
+    return {
+      type:'scatter', mode:'markers+text', name: size,
+      x: g.map(d=>d.Energy_kWh_mean), y: g.map(d=>d.Quality_Score_mean),
+      text: g.map(d=>d.Model), textposition: 'top center',
+      marker: { size: g.map(d=>Math.max(14, d.Latency_sec_mean*1.55)), color: sizeColors[size], opacity: .82, line: { color: 'white', width: 1.4 } },
+      hovertemplate: '<b>%{text}</b><br>Quality: %{y:.2f}<br>Energy: %{x:.2f} kWh<br>Latency: %{customdata.lat:.1f}s<br>Score: %{customdata.score:.2f}<extra></extra>',
+      customdata: g.map(d=>({ lat: d.Latency_sec_mean, score: d.SustainabilityScore }))
+    };
+  });
+  const xs = records.map(d=>d.Energy_kWh_mean).sort((a,b)=>a-b);
+  const ys = records.map(d=>d.Quality_Score_mean).sort((a,b)=>a-b);
+  const median = arr => arr[Math.floor(arr.length/2)];
+  const layout = {
+    template: 'plotly_white',
+    margin: { l: 60, r: 30, t: 16, b: 60 },
+    xaxis: { title: 'Mean energy per task (kWh)' },
+    yaxis: { title: 'Mean quality score (1-5)' },
+    legend: { orientation: 'h', y: 1.08 },
+    shapes: [
+      { type: 'line', x0: median(xs), x1: median(xs), y0: 0, y1: 1, xref: 'x', yref: 'paper', line: { color: '#cbd5e1', dash: 'dash' } },
+      { type: 'line', x0: 0, x1: 1, y0: median(ys), y1: median(ys), xref: 'paper', yref: 'y', line: { color: '#cbd5e1', dash: 'dash' } }
+    ]
+  };
+  Plotly.newPlot(targetId, traces, layout, { responsive: true, displayModeBar: false });
+}
+
+function buildEnergyBar(records) {
+  const sorted = [...records].sort((a,b)=>a.Energy_kWh_mean-b.Energy_kWh_mean);
+  Plotly.newPlot('energyBar', [{
+    type: 'bar', orientation: 'h', y: sorted.map(d=>d.Model), x: sorted.map(d=>d.Energy_kWh_mean),
+    marker: { color: sorted.map(d=>sizeColors[d.Model_Size]) }, text: sorted.map(d=>d.Energy_kWh_mean.toFixed(2)), textposition: 'outside'
+  }], { template: 'plotly_white', margin: { l: 110, r: 40, t: 4, b: 36 }, xaxis: { title: 'kWh per task' } }, { responsive: true, displayModeBar: false });
+}
+
+function buildLatencyBar(records) {
+  const sorted = [...records].sort((a,b)=>a.Latency_sec_mean-b.Latency_sec_mean);
+  Plotly.newPlot('latencyBar', [{
+    type: 'bar', orientation: 'h', y: sorted.map(d=>d.Model), x: sorted.map(d=>d.Latency_sec_mean),
+    marker: { color: sorted.map(d=>sizeColors[d.Model_Size]) }, text: sorted.map(d=>d.Latency_sec_mean.toFixed(1)), textposition: 'outside'
+  }], { template: 'plotly_white', margin: { l: 110, r: 40, t: 4, b: 36 }, xaxis: { title: 'seconds per task' } }, { responsive: true, displayModeBar: false });
+}
+
+function buildHeatmap(records) {
+  const cols = ['QualityNorm','EnergyEffNorm','SpeedEffNorm','FootprintIndex','SustainabilityScore'];
+  const labels = ['Quality','Energy eff.','Speed eff.','Low footprint','Score'];
+  Plotly.newPlot('heatmap', [{
+    type:'heatmap', x: labels, y: records.map(d=>d.Model), z: records.map(d=>cols.map(c=>d[c]||0)),
+    colorscale: 'YlGnBu', zmin: 0, zmax: 1, showscale: true,
+    text: records.map(d=>cols.map(c=>(d[c]||0).toFixed(2))), texttemplate: '%{text}', textfont: { size: 11 }
+  }], { template: 'plotly_white', margin: { l: 120, r: 30, t: 6, b: 50 } }, { responsive: true, displayModeBar: false });
+}
+
+function buildParallel(records) {
+  Plotly.newPlot('parallel', [{
+    type: 'parcoords',
+    line: { color: records.map(d=>d.SustainabilityScore), colorscale: 'Tealgrn', showscale: true, cmin: 0, cmax: 1, colorbar: { title: 'Score' } },
+    dimensions: [
+      { label: 'Quality', values: records.map(d=>d.Quality_Score_mean) },
+      { label: 'Latency (s)', values: records.map(d=>d.Latency_sec_mean) },
+      { label: 'Energy (kWh)', values: records.map(d=>d.Energy_kWh_mean) },
+      { label: 'CO2 (kg)', values: records.map(d=>d.CO2_kg_mean) },
+      { label: 'Footprint', values: records.map(d=>d.FootprintIndex) },
+      { label: 'Score', values: records.map(d=>d.SustainabilityScore) }
+    ]
+  }], { template: 'plotly_white', margin: { l: 70, r: 70, t: 30, b: 30 } }, { responsive: true, displayModeBar: false });
+}
+
+function buildRanking(records) {
+  const sorted = [...records].sort((a,b)=>a.SustainabilityScore-b.SustainabilityScore);
+  Plotly.newPlot('ranking', [{
+    type: 'bar', orientation: 'h', y: sorted.map(d=>d.Model), x: sorted.map(d=>d.SustainabilityScore),
+    marker: { color: sorted.map(d=>sizeColors[d.Model_Size]) }, text: sorted.map(d=>d.SustainabilityScore.toFixed(2)), textposition: 'outside'
+  }], { template: 'plotly_white', margin: { l: 120, r: 40, t: 6, b: 36 }, xaxis: { title: 'Composite sustainability score (0-1)', range: [0, 1.05] } }, { responsive: true, displayModeBar: false });
+}
+
+function buildTopCard(records) {
+  const top = records.reduce((a,b)=>b.SustainabilityScore>a.SustainabilityScore?b:a);
+  document.getElementById('topModelCard').innerHTML = `
+    <div style="font-size:1.6rem; font-weight:800; letter-spacing:-.04em">${top.Model}</div>
+    <div class="badge ${top.Model_Size==='Small'?'green':top.Model_Size==='Medium'?'blue':'red'}">${top.Model_Size}</div>
+    <div style="margin-top:14px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div><div style="font-size:.74rem; color:#64748b; letter-spacing:.08em; text-transform:uppercase; font-weight:700">Score</div><div style="font-weight:800;font-size:1.4rem">${top.SustainabilityScore.toFixed(2)}</div></div>
+      <div><div style="font-size:.74rem; color:#64748b; letter-spacing:.08em; text-transform:uppercase; font-weight:700">Quality</div><div style="font-weight:800;font-size:1.4rem">${top.Quality_Score_mean.toFixed(2)}</div></div>
+      <div><div style="font-size:.74rem; color:#64748b; letter-spacing:.08em; text-transform:uppercase; font-weight:700">Energy</div><div style="font-weight:800;font-size:1.4rem">${top.Energy_kWh_mean.toFixed(2)} kWh</div></div>
+      <div><div style="font-size:.74rem; color:#64748b; letter-spacing:.08em; text-transform:uppercase; font-weight:700">Latency</div><div style="font-weight:800;font-size:1.4rem">${top.Latency_sec_mean.toFixed(1)}s</div></div>
+    </div>`;
+}
+
+function buildRecommendations(records) {
+  const balanced = records.reduce((a,b)=>b.SustainabilityScore>a.SustainabilityScore?b:a);
+  const lowestEnergy = records.reduce((a,b)=>b.Energy_kWh_mean<a.Energy_kWh_mean?b:a);
+  const fastest = records.reduce((a,b)=>b.Latency_sec_mean<a.Latency_sec_mean?b:a);
+  const highestQuality = records.reduce((a,b)=>b.Quality_Score_mean>a.Quality_Score_mean?b:a);
+  const cardHtml = (cls, title, model) => `
+    <div class="rec ${cls}">
+      <h4>${title}: ${model.Model}</h4>
+      <p>Composite score ${model.SustainabilityScore.toFixed(2)} · model size ${model.Model_Size}</p>
+      <div class="figures">
+        <div>Quality <b>${model.Quality_Score_mean.toFixed(2)}</b></div>
+        <div>Energy <b>${model.Energy_kWh_mean.toFixed(2)} kWh</b></div>
+        <div>Latency <b>${model.Latency_sec_mean.toFixed(1)}s</b></div>
+      </div>
+    </div>`;
+  document.getElementById('recCards').innerHTML = [
+    cardHtml('', 'Best balanced', balanced),
+    cardHtml('alt', 'Lowest energy', lowestEnergy),
+    cardHtml('alt2', 'Fastest response', fastest),
+    cardHtml('alt3', 'Highest quality', highestQuality)
+  ].join('');
+}
+
+function buildDataTable(records) {
+  const table = document.getElementById('dataTable');
+  const cols = [
+    ['Rank', d=>d.Rank], ['Model', d=>d.Model], ['Size', d=>d.Model_Size],
+    ['Quality', d=>fmtNumber(d.Quality_Score_mean)], ['Latency (s)', d=>fmtNumber(d.Latency_sec_mean)],
+    ['Energy (kWh)', d=>fmtNumber(d.Energy_kWh_mean)], ['CO₂ (kg)', d=>fmtNumber(d.CO2_kg_mean)],
+    ['Footprint', d=>fmtNumber(d.FootprintIndex)], ['Score', d=>fmtNumber(d.SustainabilityScore)]
+  ];
+  const sorted = [...records].sort((a,b)=>a.Rank-b.Rank);
+  table.innerHTML = '<thead><tr>' + cols.map(c=>`<th>${c[0]}</th>`).join('') + '</tr></thead>' +
+    '<tbody>' + sorted.map(d=>'<tr>' + cols.map(c=>`<td>${c[1](d)}</td>`).join('') + '</tr>').join('') + '</tbody>';
+}
+
+function recomputeScores(records, weights) {
+  const total = weights.q + weights.e + weights.s + weights.c;
+  const safeTotal = total > 0 ? total : 1;
+  records.forEach(d => {
+    const components = [
+      { value: d.QualityNorm, weight: weights.q },
+      { value: d.EnergyEffNorm, weight: weights.e },
+      { value: d.SpeedEffNorm, weight: weights.s },
+      // Cost component is excluded if not measured (zero); weight then redistributes.
+      ...(d.Cost_EUR_mean > 0 ? [{ value: d.QualityNorm, weight: weights.c }] : [])
+    ];
+    const num = components.reduce((s,c)=>s+(c.value||0)*c.weight,0);
+    const den = components.reduce((s,c)=>s+(c.weight),0) || safeTotal;
+    d.SustainabilityScore = num/den;
+  });
+  return records;
+}
+
+function refreshAll() {
+  buildMatrix('miniMatrix', data);
+  buildMatrix('mainMatrix', data);
+  buildEnergyBar(data);
+  buildLatencyBar(data);
+  buildHeatmap(data);
+  buildParallel(data);
+  buildRanking(data);
+  buildTopCard(data);
+  buildRecommendations(data);
+  buildDataTable(data);
+}
+
+renderStats(data);
+refreshAll();
+
+['wQuality','wEnergy','wSpeed','wCost'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const weights = {
+      q: Number(document.getElementById('wQuality').value),
+      e: Number(document.getElementById('wEnergy').value),
+      s: Number(document.getElementById('wSpeed').value),
+      c: Number(document.getElementById('wCost').value)
+    };
+    recomputeScores(data, weights);
+    refreshAll();
+    const profile = weights.e > .35 ? 'green priority' : weights.s > .3 ? 'speed priority' : weights.q > .5 ? 'quality priority' : 'balanced sustainability profile';
+    document.getElementById('weightBadge').textContent = profile;
+  });
+});
+
+document.getElementById('resetBtn').addEventListener('click', () => location.reload());
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const cols = ['Model','Model_Size','Quality_Score_mean','Latency_sec_mean','Energy_kWh_mean','CO2_kg_mean','Cost_EUR_mean','SustainabilityScore'];
+  const rows = [cols.join(','), ...data.map(d=>cols.map(c=>d[c]).join(','))].join('\n');
+  const blob = new Blob([rows], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'comparia_sustainability.csv'; a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>

@@ -1,6 +1,15 @@
 # Compar'IA Benchmarking Dashboard
 
-## TP 1 – Benchmarking Small vs Large LLMs on Cost, Energy & Performance
+## Live demos
+
+| Version | URL |
+|---------|-----|
+| **Static HTML** (paper-style UI) | https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/ |
+| **Streamlit** (interactive filters + export) | Your [Streamlit Cloud](https://share.streamlit.io) app URL |
+
+Local: `streamlit run dashboard.py` → http://localhost:8501 · or open `comparia_dashboard.html` in a browser.
+
+---
 
 This project provides a comprehensive dashboard for analyzing and comparing different Large Language Models (LLMs) across multiple dimensions including quality, cost, energy consumption, and performance.
 

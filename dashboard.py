@@ -17,10 +17,11 @@ DATA_FILES = (
 AGGREGATED_DATA_FILE = "comparai_metrics_detailed.csv"
 SIZE_ORDER = ["Small", "Medium", "Large"]
 SIZE_COLORS = {
-    "Small": "#12b886",
-    "Medium": "#4dabf7",
-    "Large": "#ff6b6b",
+    "Small": "#10b981",
+    "Medium": "#38bdf8",
+    "Large": "#f43f5e",
 }
+PAGES_URL = "https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/"
 
 
 st.set_page_config(
@@ -34,100 +35,126 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-        :root {
-            --comparia-bg: #0b1020;
-            --comparia-card: #111827;
-            --comparia-soft: #1f2937;
-            --comparia-text: #f8fafc;
-            --comparia-muted: #94a3b8;
-            --comparia-green: #12b886;
-            --comparia-blue: #4dabf7;
-            --comparia-red: #ff6b6b;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        html, body, [class*="css"] {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .stApp {
+            background: linear-gradient(180deg, #050a17 0, #050a17 180px, #f1f5f9 180px, #f1f5f9 100%);
+        }
+        header[data-testid="stHeader"] {
+            background: rgba(5, 10, 23, 0.92);
         }
         .block-container {
-            padding-top: 1.2rem;
+            padding-top: 0.8rem;
             padding-bottom: 2.4rem;
+            max-width: 1280px;
         }
-        .hero {
-            background: radial-gradient(circle at top left, rgba(18,184,134,.28), transparent 30%),
-                        linear-gradient(135deg, #0f172a 0%, #111827 52%, #0b1020 100%);
+        .comparia-topbar {
+            background: rgba(5, 10, 23, 0.92);
             border: 1px solid rgba(148,163,184,.18);
-            border-radius: 28px;
-            padding: 28px 30px;
-            margin-bottom: 20px;
-            box-shadow: 0 22px 50px rgba(15,23,42,.18);
-        }
-        .hero h1 {
-            color: #f8fafc;
-            font-size: 3.1rem;
-            line-height: 1.02;
-            margin: 0;
-            letter-spacing: -0.06em;
-        }
-        .hero p {
-            color: #cbd5e1;
-            max-width: 880px;
-            margin: 12px 0 0 0;
-            font-size: 1.05rem;
-        }
-        .pill-row {
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin-bottom: 18px;
+            color: #e2e8f0;
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 18px;
+            align-items: center;
+            gap: 12px;
         }
+        .comparia-mark {
+            width: 30px; height: 30px; border-radius: 9px;
+            background: conic-gradient(from 220deg, #10b981, #38bdf8, #818cf8, #10b981);
+            display: inline-flex; align-items: center; justify-content: center;
+            color: #0b1220; font-weight: 900; font-size: 0.72rem;
+        }
+        .comparia-brand { font-weight: 800; letter-spacing: -.04em; font-size: 1.1rem; }
+        .hero-wrap {
+            color: #f8fafc;
+            padding: 8px 0 20px 0;
+        }
+        .hero-kicker {
+            color: #99f6e4;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            font-size: .78rem;
+        }
+        .hero-title {
+            font-size: clamp(1.8rem, 3.6vw, 2.8rem);
+            letter-spacing: -.06em;
+            line-height: 1.05;
+            margin: 8px 0 12px 0;
+            color: #f8fafc;
+        }
+        .hero-copy { color: #cbd5e1; font-size: 1rem; max-width: 720px; }
+        .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
         .pill {
-            color: #d1fae5;
-            background: rgba(18,184,134,.12);
-            border: 1px solid rgba(18,184,134,.38);
-            border-radius: 999px;
-            padding: 6px 12px;
-            font-size: .82rem;
-            font-weight: 650;
+            font-size: .78rem; padding: 6px 12px; border-radius: 999px;
+            border: 1px solid rgba(16,185,129,.45); color: #d1fae5;
+            background: rgba(16,185,129,.12); font-weight: 600;
         }
-        .metric-card {
+        .stat {
+            background: rgba(15,23,42,.6);
+            border: 1px solid rgba(148,163,184,.22);
+            border-radius: 18px;
+            padding: 14px 16px;
+            color: #e2e8f0;
+            min-height: 92px;
+        }
+        .stat-label {
+            color: #94a3b8; text-transform: uppercase; font-size: .68rem;
+            letter-spacing: .12em; font-weight: 700;
+        }
+        .stat-value {
+            font-size: 1.55rem; font-weight: 800; letter-spacing: -.04em; margin-top: 4px;
+        }
+        .stat-meta { color: #94a3b8; font-size: .82rem; margin-top: 2px; }
+        .panel-card {
             background: #ffffff;
             border: 1px solid #e5e7eb;
-            border-radius: 20px;
-            padding: 18px 18px 14px 18px;
-            min-height: 120px;
-            box-shadow: 0 10px 25px rgba(15,23,42,.05);
+            border-radius: 22px;
+            padding: 18px 20px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
+            margin-bottom: 12px;
         }
-        .metric-label {
-            color: #64748b;
-            font-size: .78rem;
-            font-weight: 700;
-            letter-spacing: .05em;
-            text-transform: uppercase;
-        }
-        .metric-value {
+        .panel-card h3 {
+            margin: 0 0 4px 0;
+            font-size: 1.05rem;
             color: #0f172a;
-            font-size: 2rem;
-            font-weight: 800;
-            margin-top: 6px;
         }
-        .metric-help {
-            color: #64748b;
-            font-size: .8rem;
-            margin-top: 4px;
+        .panel-desc { color: #64748b; font-size: .88rem; margin-bottom: 10px; }
+        .control-bar {
+            display: flex; flex-wrap: wrap; gap: 14px; align-items: center;
+            background: white; border: 1px solid #e5e7eb; border-radius: 18px;
+            padding: 14px 18px; margin-bottom: 14px;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .08);
         }
-        .novelty-card {
-            background: linear-gradient(135deg, #ecfeff 0%, #f0fdf4 100%);
-            border: 1px solid #a7f3d0;
-            border-radius: 18px;
-            padding: 18px;
-            margin-top: 10px;
+        .rec-card {
+            border-radius: 18px; padding: 18px 20px; margin-bottom: 10px;
         }
-        .novelty-card h4 {
-            color: #064e3b;
-            margin: 0 0 8px 0;
+        .rec-green { background: linear-gradient(135deg, #ecfdf5 0%, #f0fdfa 100%); border: 1px solid #d1fae5; }
+        .rec-blue  { background: linear-gradient(135deg, #eff6ff 0%, #ecfeff 100%); border: 1px solid #bae6fd; }
+        .rec-amber { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid #fcd34d; }
+        .rec-purple{ background: linear-gradient(135deg, #fdf4ff 0%, #fce7f3 100%); border: 1px solid #f5d0fe; }
+        .rec-title { color: #047857; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+        .rec-model { color: #0f172a; font-size: 1.35rem; font-weight: 800; margin: 6px 0; }
+        .rec-meta { color: #334155; font-size: .88rem; }
+        .size-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 999px;
+            font-size: .74rem; font-weight: 700; margin-bottom: 8px;
         }
-        .novelty-card p, .novelty-card li {
-            color: #155e75;
-            font-size: .94rem;
+        .badge-small { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+        .badge-medium { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+        .badge-large { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+        div[data-testid="stTabs"] button[data-baseweb="tab"] {
+            font-weight: 600;
         }
-        div[data-testid="stMetricValue"] {
-            font-weight: 800;
+        section[data-testid="stSidebar"] {
+            background: #0b1220;
+            color: #e2e8f0;
+        }
+        section[data-testid="stSidebar"] * {
+            color: #e2e8f0 !important;
         }
     </style>
     """,
@@ -346,13 +373,154 @@ def prepare_metrics(metrics: pd.DataFrame, weights: dict[str, float]) -> pd.Data
     return metrics.sort_values("Sustainability_Score", ascending=False).reset_index(drop=True)
 
 
+def render_topbar() -> None:
+    st.markdown(
+        """
+        <div class="comparia-topbar">
+            <span class="comparia-mark">IA</span>
+            <span class="comparia-brand">Compar'IA</span>
+            <span style="margin-left:auto;color:#94a3b8;font-size:.85rem;">
+                Sustainable LLM benchmarking dashboard
+            </span>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def render_hero(metrics: pd.DataFrame) -> None:
+    left, right = st.columns([1.5, 1])
+    with left:
+        st.markdown(
+            """
+            <div class="hero-wrap">
+                <div class="hero-kicker">Sustainability-Aware LLM Benchmarking</div>
+                <div class="hero-title">Choose LLMs that balance quality with energy, CO₂, latency and cost.</div>
+                <div class="hero-copy">
+                    Compar'IA replaces accuracy-only leaderboards with an interactive interface that links
+                    task quality to operational and environmental footprint.
+                </div>
+                <div class="pill-row">
+                    <span class="pill">Sustainability Matrix</span>
+                    <span class="pill">Normalized Multi-Metric Score</span>
+                    <span class="pill">CO₂-Aware Recommendations</span>
+                    <span class="pill">Extensible Schema</span>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
+    with right:
+        stats = [
+            ("Models", f"{metrics['Model'].nunique()}", "in current dataset"),
+            ("Avg quality", f"{metrics['Quality_Score_mean'].mean():.2f}/5", "across all tasks"),
+            ("Avg energy", f"{metrics['Energy_kWh_mean'].mean():.2f} kWh", "per task"),
+            ("Avg CO₂", f"{metrics['CO2_kg_mean'].mean():.2f} kg", "per task"),
+        ]
+        r1c1, r1c2 = st.columns(2)
+        r2c1, r2c2 = st.columns(2)
+        for col, (label, value, meta) in zip([r1c1, r1c2, r2c1, r2c2], stats):
+            with col:
+                st.markdown(
+                    f"""
+                    <div class="stat">
+                        <div class="stat-label">{label}</div>
+                        <div class="stat-value">{value}</div>
+                        <div class="stat-meta">{meta}</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+
+def size_badge_class(size: str) -> str:
+    return {"Small": "badge-small", "Medium": "badge-medium", "Large": "badge-large"}.get(str(size), "badge-medium")
+
+
+def render_top_model_card(row: pd.Series) -> None:
+    badge = size_badge_class(row["Model_Size"])
+    st.markdown(
+        f"""
+        <div class="panel-card">
+            <h3>Top model overall</h3>
+            <div class="panel-desc">Best balanced choice under the current weights.</div>
+            <div class="rec-model">{row['Model']}</div>
+            <span class="size-badge {badge}">{row['Model_Size']}</span>
+            <div class="rec-meta" style="margin-top:10px;">
+                Score <b>{row['Sustainability_Score']:.2f}</b> ·
+                Quality <b>{row['Quality_Score_mean']:.2f}</b><br>
+                Energy <b>{row['Energy_kWh_mean']:.2f} kWh</b> ·
+                Latency <b>{row['Latency_sec_mean']:.1f}s</b>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def build_energy_bar(metrics: pd.DataFrame) -> go.Figure:
+    ordered = metrics.sort_values("Energy_kWh_mean")
+    fig = px.bar(
+        ordered,
+        x="Energy_kWh_mean",
+        y="Model",
+        orientation="h",
+        color="Model_Size",
+        color_discrete_map=SIZE_COLORS,
+        text=ordered["Energy_kWh_mean"].map(lambda x: f"{x:.2f}"),
+        labels={"Energy_kWh_mean": "kWh per task", "Model": ""},
+        title="Energy footprint by model",
+    )
+    fig.update_layout(height=320, template="plotly_white", margin=dict(l=20, r=20, t=50, b=20), showlegend=False)
+    fig.update_traces(textposition="outside")
+    return fig
+
+
+def build_latency_bar(metrics: pd.DataFrame) -> go.Figure:
+    ordered = metrics.sort_values("Latency_sec_mean")
+    fig = px.bar(
+        ordered,
+        x="Latency_sec_mean",
+        y="Model",
+        orientation="h",
+        color="Model_Size",
+        color_discrete_map=SIZE_COLORS,
+        text=ordered["Latency_sec_mean"].map(lambda x: f"{x:.1f}"),
+        labels={"Latency_sec_mean": "seconds per task", "Model": ""},
+        title="Latency by model",
+    )
+    fig.update_layout(height=320, template="plotly_white", margin=dict(l=20, r=20, t=50, b=20), showlegend=False)
+    fig.update_traces(textposition="outside")
+    return fig
+
+
+def render_recommendation_card(title: str, row: pd.Series, style: str) -> None:
+    badge = size_badge_class(row["Model_Size"])
+    st.markdown(
+        f"""
+        <div class="rec-card {style}">
+            <div class="rec-title">{title}</div>
+            <div class="rec-model">{row['Model']}</div>
+            <span class="size-badge {badge}">{row['Model_Size']}</span>
+            <div class="rec-meta">
+                Score <b>{row['Sustainability_Score']:.2f}</b> ·
+                Quality <b>{row['Quality_Score_mean']:.2f}</b> ·
+                Energy <b>{row['Energy_kWh_mean']:.2f} kWh</b> ·
+                Latency <b>{row['Latency_sec_mean']:.1f}s</b>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def metric_card(label: str, value: str, help_text: str) -> None:
     st.markdown(
         f"""
-        <div class="metric-card">
-            <div class="metric-label">{label}</div>
-            <div class="metric-value">{value}</div>
-            <div class="metric-help">{help_text}</div>
+        <div class="stat" style="background:#fff;color:#0f172a;border-color:#e5e7eb;">
+            <div class="stat-label" style="color:#64748b;">{label}</div>
+            <div class="stat-value" style="color:#0f172a;">{value}</div>
+            <div class="stat-meta" style="color:#64748b;">{help_text}</div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -483,21 +651,6 @@ def build_recommendations(metrics: pd.DataFrame) -> dict[str, pd.Series]:
     return recommendations
 
 
-def render_recommendation_card(title: str, row: pd.Series) -> None:
-    st.markdown(
-        f"""
-        <div class="novelty-card">
-            <h4>{title}: {row['Model']}</h4>
-            <p>
-                Score <b>{row['Sustainability_Score']:.2f}</b> | Quality <b>{row['Quality_Score_mean']:.2f}</b> |
-                Energy <b>{row['Energy_kWh_mean']:.3f} kWh</b> | Latency <b>{row['Latency_sec_mean']:.2f}s</b>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
 def main() -> None:
     raw_df, raw_message = load_raw_data()
     aggregated_df, aggregated_message = load_aggregated_data()
@@ -515,32 +668,17 @@ def main() -> None:
         base_metrics = aggregate_raw_data(raw_df)
         source_message = "Using reproducible synthetic demonstration data"
 
-    st.markdown(
-        """
-        <div class="hero">
-            <h1>Compar'IA Sustainability Dashboard</h1>
-            <p>
-                A modern multi-objective benchmarking interface for choosing large language models
-                by quality, latency, energy, CO2, and cost rather than by accuracy alone.
-            </p>
-            <div class="pill-row">
-                <span class="pill">Sustainability matrix</span>
-                <span class="pill">Normalized score</span>
-                <span class="pill">CO2-aware ranking</span>
-                <span class="pill">Extensible to new LLMs</span>
-                <span class="pill">Exportable evidence</span>
-            </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    st.sidebar.title("Controls")
+    st.sidebar.title("Filters")
     st.sidebar.caption(source_message)
+    st.sidebar.markdown(f"[Open static HTML version]({PAGES_URL})")
 
     available_sizes = [size for size in SIZE_ORDER if size in set(base_metrics["Model_Size"].astype(str))]
     selected_sizes = st.sidebar.multiselect("Model size", available_sizes, default=available_sizes)
-    available_models = sorted(base_metrics.loc[base_metrics["Model_Size"].astype(str).isin(selected_sizes), "Model"].map(clean_model_name).unique())
+    available_models = sorted(
+        base_metrics.loc[base_metrics["Model_Size"].astype(str).isin(selected_sizes), "Model"]
+        .map(clean_model_name)
+        .unique()
+    )
     selected_models = st.sidebar.multiselect("Models", available_models, default=available_models)
 
     if raw_df is not None and "Task_Category" in raw_df.columns:
@@ -561,128 +699,85 @@ def main() -> None:
             & base_metrics["Model_Size"].astype(str).isin(selected_sizes)
         ]
 
-    st.sidebar.divider()
-    st.sidebar.subheader("Composite score weights")
-    weight_quality = st.sidebar.slider("Quality", 0.0, 1.0, 0.40, 0.05)
-    weight_energy = st.sidebar.slider("Energy efficiency", 0.0, 1.0, 0.25, 0.05)
-    weight_cost = st.sidebar.slider("Cost efficiency", 0.0, 1.0, 0.15, 0.05)
-    weight_speed = st.sidebar.slider("Speed efficiency", 0.0, 1.0, 0.20, 0.05)
-    weights = {
-        "quality": weight_quality,
-        "energy": weight_energy,
-        "cost": weight_cost,
-        "speed": weight_speed,
-    }
-
-    metrics = prepare_metrics(base_metrics, weights)
+    default_weights = {"quality": 0.40, "energy": 0.25, "cost": 0.15, "speed": 0.20}
+    metrics = prepare_metrics(base_metrics, default_weights)
     if metrics.empty:
         st.warning("No model-level metrics available after filtering.")
         return
 
-    col1, col2, col3, col4 = st.columns(4)
-    with col1:
-        metric_card("Models", f"{metrics['Model'].nunique()}", "Compared in the current filter")
-    with col2:
-        metric_card("Best score", f"{metrics['Sustainability_Score'].max():.2f}", "Normalized multi-objective score")
-    with col3:
-        metric_card("Lowest energy", f"{metrics['Energy_kWh_mean'].min():.2f}", "Mean kWh per task")
-    with col4:
-        metric_card("Average CO2", f"{metrics['CO2_kg_mean'].mean():.2f}", "Mean kg CO2e per task")
+    render_topbar()
+    render_hero(metrics)
 
-    tabs = st.tabs(
-        [
-            "Sustainability Matrix",
-            "Dashboard Insights",
-            "Recommendations",
-            "Data & Extensibility",
-        ]
-    )
+    tabs = st.tabs(["Overview", "Sustainability Matrix", "Insights", "Recommendations", "Data & Extensibility"])
 
     with tabs[0]:
-        st.subheader("Quality, footprint, and latency in one view")
-        st.plotly_chart(build_matrix(metrics), use_container_width=True)
-        st.markdown(
-            """
-            <div class="novelty-card">
-                <h4>What is novel here?</h4>
-                <p>
-                    Standard leaderboards usually sort by quality alone. Compar'IA instead places quality,
-                    energy, CO2, latency, and cost in a shared decision interface. This makes it possible
-                    to see when a lower-footprint model is nearly as useful as a larger model.
-                </p>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+        left, right = st.columns([1.6, 1])
+        with left:
+            st.markdown('<div class="panel-card"><h3>Sustainability Matrix</h3><div class="panel-desc">Quality vs energy with latency as marker size and size class as colour.</div></div>', unsafe_allow_html=True)
+            st.plotly_chart(build_matrix(metrics), width="stretch")
+        with right:
+            render_top_model_card(metrics.iloc[0])
+        c1, c2 = st.columns(2)
+        with c1:
+            st.plotly_chart(build_energy_bar(metrics), width="stretch")
+        with c2:
+            st.plotly_chart(build_latency_bar(metrics), width="stretch")
 
     with tabs[1]:
-        left, right = st.columns([1.1, 0.9])
-        with left:
-            st.plotly_chart(build_parallel_coordinates(metrics), use_container_width=True)
-        with right:
-            st.plotly_chart(build_metric_heatmap(metrics), use_container_width=True)
-
-        st.subheader("Ranking")
-        st.plotly_chart(build_ranking_chart(metrics), use_container_width=True)
+        st.markdown('<div class="control-bar"><strong>Composite score weights</strong> — adjust and re-rank models</div>', unsafe_allow_html=True)
+        w1, w2, w3, w4 = st.columns(4)
+        with w1:
+            weight_quality = st.slider("Quality", 0.0, 1.0, 0.40, 0.05)
+        with w2:
+            weight_energy = st.slider("Energy", 0.0, 1.0, 0.25, 0.05)
+        with w3:
+            weight_speed = st.slider("Speed", 0.0, 1.0, 0.20, 0.05)
+        with w4:
+            weight_cost = st.slider("Cost", 0.0, 1.0, 0.15, 0.05)
+        weights = {"quality": weight_quality, "energy": weight_energy, "cost": weight_cost, "speed": weight_speed}
+        metrics = prepare_metrics(base_metrics, weights)
+        st.plotly_chart(build_matrix(metrics), width="stretch")
 
     with tabs[2]:
-        st.subheader("Automatic model-selection recommendations")
-        recommendations = build_recommendations(metrics)
-        rec_cols = st.columns(2)
-        for i, (title, row) in enumerate(recommendations.items()):
-            with rec_cols[i % 2]:
-                render_recommendation_card(title, row)
-
-        st.info(
-            "Cost recommendations are shown only when non-zero cost measurements are present. "
-            "If costs are placeholders, the score is automatically reweighted over the valid components."
-        )
+        left, right = st.columns(2)
+        with left:
+            st.plotly_chart(build_metric_heatmap(metrics), width="stretch")
+        with right:
+            st.plotly_chart(build_parallel_coordinates(metrics), width="stretch")
+        st.plotly_chart(build_ranking_chart(metrics), width="stretch")
 
     with tabs[3]:
-        st.subheader("Extensible benchmark table")
+        recs = build_recommendations(metrics)
+        styles = ["rec-green", "rec-green", "rec-blue", "rec-amber"]
+        keys = list(recs.keys())[:4]
+        row1 = st.columns(2)
+        row2 = st.columns(2)
+        for i, title in enumerate(keys):
+            target = row1[i % 2] if i < 2 else row2[i - 2]
+            with target:
+                render_recommendation_card(title, recs[title], styles[i % len(styles)])
+        st.info("Cost recommendations appear only when non-zero cost data is available.")
+
+    with tabs[4]:
         display_cols = [
-            "Model",
-            "Model_Size",
-            "Quality_Score_mean",
-            "Latency_sec_mean",
-            "Energy_kWh_mean",
-            "CO2_kg_mean",
-            "Cost_EUR_mean",
-            "Quality_Efficiency",
-            "Speed_Efficiency",
-            "Sustainability_Score",
-            "Footprint_Index",
-            "Operational_Readiness",
+            "Model", "Model_Size", "Quality_Score_mean", "Latency_sec_mean",
+            "Energy_kWh_mean", "CO2_kg_mean", "Cost_EUR_mean",
+            "Sustainability_Score", "Footprint_Index",
         ]
         existing_cols = [col for col in display_cols if col in metrics.columns]
-        st.dataframe(
-            metrics[existing_cols].round(4),
-            use_container_width=True,
-            hide_index=True,
-        )
-
+        st.dataframe(metrics[existing_cols].round(4), width="stretch", hide_index=True)
         st.markdown(
             """
-            <div class="novelty-card">
-                <h4>How it expands over time</h4>
-                <ul>
-                    <li>Add a newly released LLM by adding rows to the CSV template.</li>
-                    <li>Add task domains by introducing new task-category labels.</li>
-                    <li>Add sustainability metrics such as water usage, memory footprint, or regional carbon intensity as new columns.</li>
-                    <li>Export filtered results for papers, reports, and institutional procurement decisions.</li>
-                </ul>
-            </div>
-            """,
-            unsafe_allow_html=True,
+            **Extending the dashboard**
+            1. Add a row in the CSV template for each new model and task.
+            2. Optionally add columns for water usage, regional carbon intensity, or memory footprint.
+            3. Reload the app — aggregations, scoring, and recommendations recompute automatically.
+            """
         )
-
         csv = metrics[existing_cols].to_csv(index=False).encode("utf-8")
-        st.download_button(
-            "Download filtered metrics CSV",
-            data=csv,
-            file_name="comparia_sustainability_metrics.csv",
-            mime="text/csv",
-        )
+        st.download_button("Export CSV", data=csv, file_name="comparia_sustainability.csv", mime="text/csv")
+
+    st.caption(f"Static HTML mirror: {PAGES_URL}")
 
 
 if __name__ == "__main__":
