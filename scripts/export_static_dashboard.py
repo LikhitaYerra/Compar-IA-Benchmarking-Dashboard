@@ -71,6 +71,7 @@ def main() -> None:
 
     docs_index = ROOT / "docs" / "index.html"
     docs_index.write_text(patched, encoding="utf-8")
+    (ROOT / "index.html").write_text(patched, encoding="utf-8")
 
     print(f"Updated {html_source.name} and docs/index.html ({len(records)} models)")
     print(f"Top model: {records[0]['Model']} (score {records[0]['SustainabilityScore']})")

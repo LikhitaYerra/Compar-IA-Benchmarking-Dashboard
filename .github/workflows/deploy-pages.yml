@@ -27,7 +27,8 @@ jobs:
         run: |
           python scripts/export_static_dashboard.py
           cp comparia_dashboard.html docs/index.html
-          touch docs/.nojekyll
+          cp comparia_dashboard.html index.html
+          touch docs/.nojekyll .nojekyll
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
