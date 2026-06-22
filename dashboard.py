@@ -714,37 +714,37 @@ def main() -> None:
         left, right = st.columns([1.6, 1])
         with left:
             st.markdown('<div class="panel-card"><h3>Sustainability Matrix</h3><div class="panel-desc">Quality vs energy with latency as marker size and size class as colour.</div></div>', unsafe_allow_html=True)
-            st.plotly_chart(build_matrix(metrics), width="stretch")
+            st.plotly_chart(build_matrix(metrics), width="stretch", key="overview_matrix")
         with right:
             render_top_model_card(metrics.iloc[0])
         c1, c2 = st.columns(2)
         with c1:
-            st.plotly_chart(build_energy_bar(metrics), width="stretch")
+            st.plotly_chart(build_energy_bar(metrics), width="stretch", key="overview_energy")
         with c2:
-            st.plotly_chart(build_latency_bar(metrics), width="stretch")
+            st.plotly_chart(build_latency_bar(metrics), width="stretch", key="overview_latency")
 
     with tabs[1]:
         st.markdown('<div class="control-bar"><strong>Composite score weights</strong> — adjust and re-rank models</div>', unsafe_allow_html=True)
         w1, w2, w3, w4 = st.columns(4)
         with w1:
-            weight_quality = st.slider("Quality", 0.0, 1.0, 0.40, 0.05)
+            weight_quality = st.slider("Quality", 0.0, 1.0, 0.40, 0.05, key="weight_quality")
         with w2:
-            weight_energy = st.slider("Energy", 0.0, 1.0, 0.25, 0.05)
+            weight_energy = st.slider("Energy", 0.0, 1.0, 0.25, 0.05, key="weight_energy")
         with w3:
-            weight_speed = st.slider("Speed", 0.0, 1.0, 0.20, 0.05)
+            weight_speed = st.slider("Speed", 0.0, 1.0, 0.20, 0.05, key="weight_speed")
         with w4:
-            weight_cost = st.slider("Cost", 0.0, 1.0, 0.15, 0.05)
+            weight_cost = st.slider("Cost", 0.0, 1.0, 0.15, 0.05, key="weight_cost")
         weights = {"quality": weight_quality, "energy": weight_energy, "cost": weight_cost, "speed": weight_speed}
         metrics = prepare_metrics(base_metrics, weights)
-        st.plotly_chart(build_matrix(metrics), width="stretch")
+        st.plotly_chart(build_matrix(metrics), width="stretch", key="matrix_main")
 
     with tabs[2]:
         left, right = st.columns(2)
         with left:
-            st.plotly_chart(build_metric_heatmap(metrics), width="stretch")
+            st.plotly_chart(build_metric_heatmap(metrics), width="stretch", key="insights_heatmap")
         with right:
-            st.plotly_chart(build_parallel_coordinates(metrics), width="stretch")
-        st.plotly_chart(build_ranking_chart(metrics), width="stretch")
+            st.plotly_chart(build_parallel_coordinates(metrics), width="stretch", key="insights_parallel")
+        st.plotly_chart(build_ranking_chart(metrics), width="stretch", key="insights_ranking")
 
     with tabs[3]:
         recs = build_recommendations(metrics)
@@ -765,7 +765,7 @@ def main() -> None:
             "Sustainability_Score", "Footprint_Index",
         ]
         existing_cols = [col for col in display_cols if col in metrics.columns]
-        st.dataframe(metrics[existing_cols].round(4), width="stretch", hide_index=True)
+        st.dataframe(metrics[existing_cols].round(4), width="stretch", hide_index=True, key="data_table")
         st.markdown(
             """
             **Extending the dashboard**
@@ -775,7 +775,13 @@ def main() -> None:
             """
         )
         csv = metrics[existing_cols].to_csv(index=False).encode("utf-8")
-        st.download_button("Export CSV", data=csv, file_name="comparia_sustainability.csv", mime="text/csv")
+        st.download_button(
+            "Export CSV",
+            data=csv,
+            file_name="comparia_sustainability.csv",
+            mime="text/csv",
+            key="export_csv",
+        )
 
     st.caption(f"Static HTML mirror: {PAGES_URL}")
 
