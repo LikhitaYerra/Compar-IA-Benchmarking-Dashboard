@@ -818,10 +818,9 @@ def main() -> None:
 
     with tabs[0]:
         section_heading(
-            "Sustainability Matrix",
-            "Quality vs energy with latency as marker size and size class as colour. Hover a point for model details.",
+            "Overview",
+            "Headline model, energy, and latency. The quality–energy plot is on the Sustainability Matrix tab.",
         )
-        st.plotly_chart(build_matrix(metrics), use_container_width=True, key="overview_matrix")
         c1, c2, c3 = st.columns([1, 1.2, 1.2])
         with c1:
             render_top_model_card(metrics.iloc[0])

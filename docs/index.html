@@ -197,22 +197,17 @@
   <!-- OVERVIEW VIEW -->
   <main class="view active" data-view="overview">
     <div class="grid">
-      <div class="card span8">
-        <h2>Sustainability Matrix</h2>
-        <div class="desc">Quality vs energy, with latency encoded as marker size and size class as colour. The dashed lines are the population medians, splitting models into low- and high-footprint clusters.</div>
-        <div id="miniMatrix" style="height: 380px"></div>
-      </div>
       <div class="card span4">
         <h2>Top model overall</h2>
-        <div class="desc">Best balanced choice under the current weights.</div>
+        <div class="desc">Best balanced choice under the current weights. Open the Sustainability Matrix tab for the quality–energy plot.</div>
         <div id="topModelCard"></div>
       </div>
-      <div class="card span6">
+      <div class="card span4">
         <h2>Energy footprint by model</h2>
         <div class="desc">Mean kWh per task; lower bars are greener choices.</div>
         <div id="energyBar" style="height: 320px"></div>
       </div>
-      <div class="card span6">
+      <div class="card span4">
         <h2>Latency by model</h2>
         <div class="desc">Mean seconds per task; sorted from most responsive to slowest.</div>
         <div id="latencyBar" style="height: 320px"></div>
@@ -536,7 +531,6 @@ function recomputeScores(records, weights) {
 }
 
 function refreshAll() {
-  buildMatrix('miniMatrix', data);
   buildMatrix('mainMatrix', data);
   buildEnergyBar(data);
   buildLatencyBar(data);
