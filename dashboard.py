@@ -22,6 +22,38 @@ SIZE_COLORS = {
     "Large": "#f43f5e",
 }
 PAGES_URL = "https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/"
+TASK_CATALOG: list[tuple[int, str, str]] = [
+    (1, "Factual & Rewriting", "Who is the current UN Secretary-General?"),
+    (2, "Factual & Rewriting", "Summarise a 150-word news article in one sentence."),
+    (3, "Factual & Rewriting", "Translate a paragraph about climate change into French."),
+    (4, "Factual & Rewriting", "Classify sentiment of 3 tweets (positive/negative)."),
+    (5, "Factual & Rewriting", "Extract email & phone number from a text."),
+    (6, "Factual & Rewriting", "Explain the difference between RAM and ROM."),
+    (7, "Factual & Rewriting", "Name three renewable energy sources."),
+    (8, "Factual & Rewriting", "Turn a dense paragraph into bullet points."),
+    (9, "Factual & Rewriting", "Rewrite a sentence in a formal business tone."),
+    (10, "Factual & Rewriting", "Create a catchy blog title about electric cars."),
+    (11, "Reasoning & Quantitative", "Train A leaves at 10:00 at 100 km/h, Train B at 11:00 at 120 km/h — when do they meet?"),
+    (12, "Reasoning & Quantitative", "Solve a system: 2x+3y=12 and x-y=4."),
+    (13, "Reasoning & Quantitative", "Give the derivative of x³+2x²-5x+7."),
+    (14, "Reasoning & Quantitative", "Explain 'overfitting' simply."),
+    (15, "Reasoning & Quantitative", "Convert 1500 W to kWh for 24 h and to yearly cost at 0.20 €/kWh."),
+    (16, "Programming & Debugging", "Write Python code reversing a string."),
+    (17, "Programming & Debugging", "Fix the bug in 'for i in range(5) print(i)'."),
+    (18, "Programming & Debugging", "Explain what this recursive Python function returns."),
+    (19, "Programming & Debugging", "Suggest an optimisation for a slow SQL query."),
+    (20, "Programming & Debugging", "Explain Big-O complexity of binary search."),
+    (21, "Knowledge & Reasoning", "Compare nuclear vs solar energy (3 pros / 3 cons each)."),
+    (22, "Knowledge & Reasoning", "Explain GDPR compliance steps for a SaaS startup."),
+    (23, "Knowledge & Reasoning", "Summarise a Wikipedia article on climate change into 5 key bullet points."),
+    (24, "Knowledge & Reasoning", "Describe in detail the transformer architecture (attention, encoder/decoder)."),
+    (25, "Knowledge & Reasoning", "List and explain three differences between supervised, unsupervised, and reinforcement learning."),
+    (26, "Advanced & Creative", "Write a project plan for deploying AI to monitor deforestation using satellites."),
+    (27, "Advanced & Creative", "Draft a LinkedIn post convincing a company to adopt green AI."),
+    (28, "Advanced & Creative", "Create a short legal disclaimer about data privacy for an AI chatbot."),
+    (29, "Advanced & Creative", "Imagine and explain a new business model that uses AI to reduce carbon emissions in logistics."),
+    (30, "Advanced & Creative", "Analyse a research abstract and rewrite it for a non-technical policymaker."),
+]
 
 
 def configure_page() -> None:
@@ -846,6 +878,16 @@ def main() -> None:
         ]
         existing_cols = [col for col in display_cols if col in metrics.columns]
         st.dataframe(metrics[existing_cols].round(4), use_container_width=True, hide_index=True)
+        section_heading(
+            "Reference task list (30 tasks)",
+            "The 180 measurements come from these 30 prompts, run once on each of the six models.",
+        )
+        st.dataframe(
+            pd.DataFrame(TASK_CATALOG, columns=["Task ID", "Category", "Prompt"]),
+            use_container_width=True,
+            hide_index=True,
+            height=420,
+        )
         st.markdown(
             """
             **Extending the dashboard**

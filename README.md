@@ -60,13 +60,47 @@ streamlit run dashboard.py
 
 ## 📋 Task Categories
 
-The dashboard supports analysis across 5 task categories:
+The dashboard supports analysis across 5 task categories (30 prompts; each run once on 6 models = 180 measurements):
 
-1. **Factual & Rewriting** (Tasks 1-10): Basic factual questions and text processing
-2. **Reasoning & Quantitative** (Tasks 11-15): Mathematical and logical reasoning
-3. **Programming & Debugging** (Tasks 16-20): Code generation and debugging
-4. **Knowledge & Reasoning** (Tasks 21-25): Complex domain knowledge
-5. **Advanced & Creative** (Tasks 26-30): Multi-step creative and analytical tasks
+### Factual & Rewriting (1–10)
+1. Who is the current UN Secretary-General?
+2. Summarise a 150-word news article in one sentence.
+3. Translate a paragraph about climate change into French.
+4. Classify sentiment of 3 tweets (positive/negative).
+5. Extract email & phone number from a text.
+6. Explain the difference between RAM and ROM.
+7. Name three renewable energy sources.
+8. Turn a dense paragraph into bullet points.
+9. Rewrite a sentence in a formal business tone.
+10. Create a catchy blog title about electric cars.
+
+### Reasoning & Quantitative (11–15)
+11. Train A leaves at 10:00 at 100 km/h, Train B at 11:00 at 120 km/h — when do they meet?
+12. Solve a system: 2x+3y=12 and x-y=4.
+13. Give the derivative of x³+2x²-5x+7.
+14. Explain 'overfitting' simply.
+15. Convert 1500 W to kWh for 24 h and to yearly cost at 0.20 €/kWh.
+
+### Programming & Debugging (16–20)
+16. Write Python code reversing a string.
+17. Fix the bug in `for i in range(5) print(i)`.
+18. Explain what this recursive Python function returns.
+19. Suggest an optimisation for a slow SQL query.
+20. Explain Big-O complexity of binary search.
+
+### Knowledge & Reasoning (21–25)
+21. Compare nuclear vs solar energy (3 pros / 3 cons each).
+22. Explain GDPR compliance steps for a SaaS startup.
+23. Summarise a Wikipedia article on climate change into 5 key bullet points.
+24. Describe in detail the transformer architecture (attention, encoder/decoder).
+25. List and explain three differences between supervised, unsupervised, and reinforcement learning.
+
+### Advanced & Creative (26–30)
+26. Write a project plan for deploying AI to monitor deforestation using satellites.
+27. Draft a LinkedIn post convincing a company to adopt green AI.
+28. Create a short legal disclaimer about data privacy for an AI chatbot.
+29. Imagine and explain a new business model that uses AI to reduce carbon emissions in logistics.
+30. Analyse a research abstract and rewrite it for a non-technical policymaker.
 
 ## 🔧 Usage
 
