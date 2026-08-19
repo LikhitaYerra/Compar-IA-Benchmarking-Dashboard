@@ -5,7 +5,7 @@
 | Version | URL |
 |---------|-----|
 | **Static HTML** (paper-style UI) | https://likhitayerra.github.io/Compar-IA-Benchmarking-Dashboard/ |
-| **Streamlit** (interactive filters + export) | Your [Streamlit Cloud](https://share.streamlit.io) app URL |
+| **Streamlit** (interactive filters + export) | https://compar-ia-lyerra-aivancity.streamlit.app |
 
 Local: `streamlit run dashboard.py` → http://localhost:8501 · or open `comparia_dashboard.html` in a browser.
 
