@@ -205,15 +205,28 @@ def safe_divide(numerator: pd.Series, denominator: pd.Series) -> pd.Series:
     return numerator / denominator
 
 
-def minmax(series: pd.Series, higher_is_better: bool = True) -> pd.Series:
+def minmax(
+    series: pd.Series,
+    higher_is_better: bool = True,
+    *,
+    floor: float | None = None,
+    ceiling: float | None = None,
+) -> pd.Series:
+    """Min-max scale to [0, 1]. Optional floor/ceiling avoid mapping the worst
+    model in a small cohort to an absolute zero when a natural scale exists
+    (quality rubric 1-5; efficiency ratios cannot go below 0)."""
     values = pd.to_numeric(series, errors="coerce").replace([np.inf, -np.inf], np.nan)
-    if not higher_is_better:
-        values = -values
-    min_value = values.min(skipna=True)
-    max_value = values.max(skipna=True)
-    if pd.isna(min_value) or pd.isna(max_value) or max_value == min_value:
+    observed_min = values.min(skipna=True)
+    observed_max = values.max(skipna=True)
+    lo = observed_min if floor is None else floor
+    hi = observed_max if ceiling is None else ceiling
+    if pd.isna(lo) or pd.isna(hi) or hi == lo:
         return pd.Series(0.5, index=series.index)
-    return (values - min_value) / (max_value - min_value)
+    if higher_is_better:
+        scaled = (values - lo) / (hi - lo)
+    else:
+        scaled = (hi - values) / (hi - lo)
+    return scaled.clip(lower=0.0, upper=1.0)
 
 
 def create_sample_data(seed: int = 42) -> pd.DataFrame:
@@ -373,10 +386,12 @@ def prepare_metrics(metrics: pd.DataFrame, weights: dict[str, float]) -> pd.Data
         metrics["Cost_EUR_mean"] = np.nan
         metrics["Cost_Efficiency"] = np.nan
 
-    metrics["Quality_norm"] = minmax(metrics["Quality_Score_mean"])
-    metrics["EnergyEfficiency_norm"] = minmax(metrics["Quality_Efficiency"])
-    metrics["CostEfficiency_norm"] = minmax(metrics["Cost_Efficiency"])
-    metrics["SpeedEfficiency_norm"] = minmax(metrics["Speed_Efficiency"])
+    # Quality uses the rubric range [1, 5]. Efficiency uses a zero floor so the
+    # worst model in a six-model cohort is not scored as 0.00 on every axis.
+    metrics["Quality_norm"] = minmax(metrics["Quality_Score_mean"], floor=1.0, ceiling=5.0)
+    metrics["EnergyEfficiency_norm"] = minmax(metrics["Quality_Efficiency"], floor=0.0)
+    metrics["CostEfficiency_norm"] = minmax(metrics["Cost_Efficiency"], floor=0.0)
+    metrics["SpeedEfficiency_norm"] = minmax(metrics["Speed_Efficiency"], floor=0.0)
     metrics["LowEnergy_norm"] = minmax(metrics["Energy_kWh_mean"], higher_is_better=False)
     metrics["LowCO2_norm"] = minmax(metrics["CO2_kg_mean"], higher_is_better=False)
     metrics["LowLatency_norm"] = minmax(metrics["Latency_sec_mean"], higher_is_better=False)
